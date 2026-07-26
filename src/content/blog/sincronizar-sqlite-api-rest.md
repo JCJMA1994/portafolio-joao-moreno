@@ -3,6 +3,10 @@ title: 'Sincronizar SQLite con una API REST sin perder datos'
 description: 'La cola de escrituras pendientes es la parte que nadie explica en los tutoriales de offline-first. Así la implemento en Flutter.'
 pubDate: 2026-07-14
 tags: ['arquitectura', 'sqlite', 'flutter']
+level: 'intermedio'
+series:
+  name: 'Offline-first'
+  order: 1
 ---
 
 Casi todos los tutoriales de offline-first en Flutter terminan donde empieza

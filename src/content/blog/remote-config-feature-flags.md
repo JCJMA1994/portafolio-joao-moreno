@@ -3,6 +3,7 @@ title: 'Remote Config como interruptor de emergencia, no solo para A/B'
 description: 'Firebase Remote Config sirve para apagar una feature rota en producción sin pasar por la revisión de la store. El patrón kill switch y sus trampas.'
 pubDate: 2026-07-25
 tags: ['flutter', 'firebase', 'remote-config']
+level: 'intermedio'
 ---
 
 Casi todo el mundo conoce Remote Config para experimentos A/B. Su uso más

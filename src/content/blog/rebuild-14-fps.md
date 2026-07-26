@@ -3,6 +3,10 @@ title: 'Encontré el rebuild que me costaba 14 fps'
 description: 'Cómo uso Flutter DevTools para localizar widgets que se reconstruyen sin motivo, con el proceso exacto que sigo paso a paso.'
 pubDate: 2026-05-11
 tags: ['rendimiento', 'flutter', 'devtools']
+level: 'principiante'
+series:
+  name: 'Perfilar rebuilds'
+  order: 1
 ---
 
 La pantalla iba a 46 fps en un dispositivo de gama media y no había ninguna

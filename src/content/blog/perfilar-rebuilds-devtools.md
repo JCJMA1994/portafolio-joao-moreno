@@ -3,6 +3,10 @@ title: 'Perfilar rebuilds: por qué esa lista salta a 14 fps'
 description: 'Cómo encontrar el widget que se reconstruye de más con el Rebuild Stats de DevTools, y las tres causas que explican el 90% de los jank en listas de Flutter.'
 pubDate: 2026-07-25
 tags: ['flutter', 'rendimiento', 'devtools']
+level: 'intermedio'
+series:
+  name: 'Perfilar rebuilds'
+  order: 2
 ---
 
 Una lista que baja de 60 a 14 fps casi nunca es culpa de Flutter: es un widget

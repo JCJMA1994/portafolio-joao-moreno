@@ -3,6 +3,10 @@ title: 'Cola de sincronización offline: que la app sirva en un ascensor'
 description: 'El patrón outbox aplicado a Flutter con SQLite: encolar la mutación local, marcarla como pendiente y drenar la cola al reconectar. Sin perder datos.'
 pubDate: 2026-07-22
 tags: ['flutter', 'sqlite', 'offline', 'arquitectura']
+level: 'avanzado'
+series:
+  name: 'Offline-first'
+  order: 2
 ---
 
 "Offline-first" suena a eslogan hasta que el usuario está en un ascensor y

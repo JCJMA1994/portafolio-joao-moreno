@@ -3,6 +3,7 @@ title: 'Records de Dart 3: devolver dos valores sin crear una clase'
 description: 'Cuándo un record reemplaza a una clase de una sola vez y cuándo sigue haciendo falta el tipo con nombre. La regla es la duración de vida del dato.'
 pubDate: 2026-07-08
 tags: ['dart', 'dart-3', 'records']
+level: 'principiante'
 ---
 
 Antes de Dart 3, devolver dos valores desde una función te dejaba tres

@@ -1,6 +1,7 @@
 import { defineCollection } from 'astro:content';
 import { z } from 'astro/zod';
 import { glob } from 'astro/loaders';
+import { blogSchema } from '@/content/blog-schema';
 
 /**
  * Los esquemas son la red de seguridad del contenido: si te olvidas
@@ -9,16 +10,7 @@ import { glob } from 'astro/loaders';
  */
 const blog = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/blog' }),
-  schema: z.object({
-    title: z.string().max(70, 'Máximo 70 caracteres o Google lo corta'),
-    description: z.string().min(50).max(160),
-    pubDate: z.coerce.date(),
-    updatedDate: z.coerce.date().optional(),
-    tags: z.array(z.string()).min(1),
-    draft: z.boolean().default(false),
-    /** Imagen social propia; si falta se genera una por defecto */
-    ogImage: z.string().optional(),
-  }),
+  schema: blogSchema,
 });
 
 const tips = defineCollection({

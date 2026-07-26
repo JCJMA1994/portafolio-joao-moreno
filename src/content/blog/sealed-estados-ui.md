@@ -3,6 +3,7 @@ title: 'Estados de UI con sealed: el compilador te obliga a no olvidar ninguno'
 description: 'Modelar loading, error y datos con clases sealed y switch exhaustivo. Si añades un estado y olvidas pintarlo, el build falla en vez de la pantalla en blanco.'
 pubDate: 2026-07-15
 tags: ['dart', 'dart-3', 'flutter', 'estado']
+level: 'intermedio'
 ---
 
 El bug clásico de una pantalla con estados: agregas un estado nuevo —digamos

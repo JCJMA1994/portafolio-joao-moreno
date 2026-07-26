@@ -3,6 +3,7 @@ title: 'BLoC o Cubit: cómo decido en cada pantalla'
 description: 'Una regla simple basada en cuántos eventos distintos tiene el flujo, en lugar de decidir por costumbre o por preferencia del equipo.'
 pubDate: 2026-06-02
 tags: ['estado', 'flutter', 'bloc']
+level: 'intermedio'
 ---
 
 La discusión de BLoC contra Cubit suele resolverse por costumbre: el equipo
