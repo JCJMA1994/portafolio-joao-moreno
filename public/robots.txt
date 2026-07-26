@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /cv
+Disallow: /links/stats
+
+Sitemap: https://morenoaleman.dev/sitemap-index.xml
