@@ -25,7 +25,7 @@ const {
   plain = false,
 } = Astro.props;
 
-const site = Astro.site ?? new URL('https://morenoaleman.dev');
+const site = Astro.site ?? new URL('https://portafolio-joao-moreno.vercel.app');
 const canonical = new URL(path, site).toString();
 const ogUrl = new URL(ogImage, site).toString();
 
