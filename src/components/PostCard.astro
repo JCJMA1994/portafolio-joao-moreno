@@ -1,5 +1,6 @@
 ---
 import { formatDate, isoDate } from '@/lib/utils';
+import LevelBadge from '@/components/LevelBadge.astro';
 
 interface Props {
   slug: string;
@@ -8,15 +9,19 @@ interface Props {
   pubDate: Date;
   minutes: number;
   tags: string[];
+  level: 'principiante' | 'intermedio' | 'avanzado';
 }
-const { slug, title, description, pubDate, minutes, tags } = Astro.props;
+const { slug, title, description, pubDate, minutes, tags, level } = Astro.props;
 ---
 
 <li class="grid gap-1 border-b border-tone py-6">
-  <p class="m-0 font-mono text-xs tracking-[0.02em] text-slate">
-    <time datetime={isoDate(pubDate)}>{formatDate(pubDate)}</time>
-    · {minutes} min · {tags[0]}
-  </p>
+  <div class="flex flex-wrap items-center gap-2">
+    <p class="m-0 font-mono text-xs tracking-[0.02em] text-slate">
+      <time datetime={isoDate(pubDate)}>{formatDate(pubDate)}</time>
+      · {minutes} min · {tags[0]}
+    </p>
+    <LevelBadge level={level} />
+  </div>
   <a
     href={`/blog/${slug}`}
     class="max-w-[30ch] font-impact text-[clamp(1.5rem,3.6vw,2.25rem)] leading-[0.98] font-extrabold uppercase no-underline transition-colors hover:text-red"

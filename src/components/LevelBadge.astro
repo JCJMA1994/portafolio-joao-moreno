@@ -1,0 +1,38 @@
+---
+/**
+ * Insignia de dificultad. Es la única excepción deliberada a la
+ * disciplina de cuatro colores del tema (ver globals.css): el nivel
+ * es un semáforo y necesita tres tonos distinguibles por color, no
+ * solo por texto. Los tres tonos están verificados para contraste
+ * AA contra el fondo (`--color-paper` en claro, `--color-paper` en
+ * oscuro) — ver tests/e2e/a11y.spec.ts.
+ */
+interface Props {
+  level: 'principiante' | 'intermedio' | 'avanzado';
+}
+const { level } = Astro.props;
+
+const LABEL: Record<Props['level'], string> = {
+  principiante: 'Principiante',
+  intermedio: 'Intermedio',
+  avanzado: 'Avanzado',
+};
+
+const TONE: Record<Props['level'], string> = {
+  principiante: 'border-[#0f6e30] text-[#0f6e30] dark:border-[#4ade80] dark:text-[#4ade80]',
+  intermedio: 'border-[#8a4d00] text-[#8a4d00] dark:border-[#fbbf24] dark:text-[#fbbf24]',
+  // El rojo del tema ya está verificado AA en ambos modos (ver
+  // globals.css): reutilizarlo aquí evita introducir un cuarto tono.
+  avanzado: 'border-red text-red',
+};
+---
+
+<span
+  class:list={[
+    'inline-block shrink-0 border-2 px-1.5 py-0.5 font-mono text-[0.5625rem] font-semibold tracking-[0.06em] uppercase',
+    TONE[level],
+  ]}
+  aria-label={`Nivel: ${LABEL[level]}`}
+>
+  {LABEL[level]}
+</span>
