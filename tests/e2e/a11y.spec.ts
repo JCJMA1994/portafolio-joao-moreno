@@ -10,6 +10,7 @@ const pages = [
   { path: '/', name: 'home' },
   { path: '/blog', name: 'índice de blog' },
   { path: '/blog/sincronizar-sqlite-api-rest', name: 'artículo' },
+  { path: '/blog/series/offline-first', name: 'serie de blog' },
   { path: '/tips', name: 'apuntes' },
   { path: '/cv', name: 'cv' },
 ];
@@ -42,3 +43,23 @@ test('el foco es visible en los enlaces de navegación', async ({ page }) => {
   const outline = await link.evaluate((el) => getComputedStyle(el).outlineWidth);
   expect(outline).not.toBe('0px');
 });
+
+/**
+ * La insignia de nivel es la única excepción a la paleta de cuatro
+ * colores (ver LevelBadge.astro): verificamos sus tres tonos contra
+ * axe en ambos esquemas de color, no solo confiar en el escaneo
+ * general de página.
+ */
+for (const scheme of ['light', 'dark'] as const) {
+  test(`las insignias de nivel pasan contraste de color en modo ${scheme}`, async ({ page }) => {
+    await page.emulateMedia({ colorScheme: scheme });
+    await page.goto('/blog');
+    const results = await new AxeBuilder({ page })
+      .include('[aria-label^="Nivel:"]')
+      .withTags(['wcag2aa'])
+      .analyze();
+
+    const contrastViolations = results.violations.filter((v) => v.id === 'color-contrast');
+    expect(contrastViolations, JSON.stringify(contrastViolations, null, 2)).toEqual([]);
+  });
+}
