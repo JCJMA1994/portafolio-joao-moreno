@@ -1,0 +1,121 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '@/layouts/Base.astro';
+import Nav from '@/components/Nav.astro';
+import Footer from '@/components/Footer.astro';
+import { formatDate, isoDate, readingTime } from '@/lib/utils';
+import { profile } from '@/data/profile';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post } }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const minutes = readingTime(post.body ?? '');
+const origin = Astro.site?.origin ?? '';
+
+// Artículos relacionados por etiqueta compartida.
+const all = await getCollection('blog', ({ data }) => !data.draft);
+const related = all
+  .filter((p) => p.id !== post.id && p.data.tags.some((t) => post.data.tags.includes(t)))
+  .slice(0, 2);
+---
+
+<Base
+  title={`${post.data.title} · ${profile.name}`}
+  description={post.data.description}
+  path={`/blog/${post.id}`}
+  ogImage={post.data.ogImage}
+  schema={[
+    {
+      '@type': 'BlogPosting',
+      '@id': `${origin}/blog/${post.id}#article`,
+      headline: post.data.title,
+      description: post.data.description,
+      datePublished: post.data.pubDate.toISOString(),
+      dateModified: (post.data.updatedDate ?? post.data.pubDate).toISOString(),
+      keywords: post.data.tags.join(', '),
+      inLanguage: 'es-PE',
+      wordCount: (post.body ?? '').split(/\s+/).length,
+      author: { '@id': `${origin}/#person` },
+      publisher: { '@id': `${origin}/#person` },
+      isPartOf: { '@id': `${origin}/blog#blog` },
+      mainEntityOfPage: { '@type': 'WebPage', '@id': `${origin}/blog/${post.id}` },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Inicio', item: origin },
+        { '@type': 'ListItem', position: 2, name: 'Blog', item: `${origin}/blog` },
+        { '@type': 'ListItem', position: 3, name: post.data.title },
+      ],
+    },
+  ]}
+>
+  <Nav />
+
+  <main id="main" class="mx-auto max-w-[80rem] px-[var(--pad)] py-12 sm:py-20">
+    <nav
+      aria-label="Ruta de navegación"
+      class="mb-8 font-mono text-[0.625rem] tracking-[0.1em] text-slate uppercase"
+    >
+      <a href="/" class="no-underline hover:text-ink">Inicio</a> /
+      <a href="/blog" class="no-underline hover:text-ink">Blog</a> /
+      <span>{post.data.tags[0]}</span>
+    </nav>
+
+    <article>
+      <header class="mb-10 border-b-2 border-ink pb-6">
+        <h1 class="max-w-[26ch] text-[clamp(2rem,7vw,4.5rem)] leading-[0.9] font-black">
+          {post.data.title}
+        </h1>
+        <p class="mt-5 mb-0 font-mono text-[0.625rem] tracking-[0.12em] text-slate uppercase">
+          <time datetime={isoDate(post.data.pubDate)}>{formatDate(post.data.pubDate)}</time>
+          · {minutes} min de lectura ·
+          {
+            post.data.tags.map((tag) => (
+              <a href={`/blog/tag/${tag}`} class="no-underline hover:text-ink">
+                {tag}{' '}
+              </a>
+            ))
+          }
+        </p>
+      </header>
+
+      <div class="prose-manga">
+        <Content />
+      </div>
+    </article>
+
+    {
+      related.length > 0 && (
+        <aside class="mt-20 border-t-2 border-ink pt-8">
+          <h2 class="mb-6 text-base tracking-[0.1em]">Sigue leyendo</h2>
+          <ul class="m-0 grid list-none gap-0 border-2 border-ink p-0 sm:grid-cols-2">
+            {related.map((item, i) => (
+              <li
+                class:list={[
+                  'p-5 transition-colors hover:screentone',
+                  i === 0 &&
+                    related.length > 1 &&
+                    'border-b-2 border-ink sm:border-r-2 sm:border-b-0',
+                ]}
+              >
+                <a
+                  href={`/blog/${item.id}`}
+                  class="font-impact text-xl leading-none font-extrabold uppercase no-underline"
+                >
+                  {item.data.title}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </aside>
+      )
+    }
+  </main>
+
+  <Footer />
+</Base>

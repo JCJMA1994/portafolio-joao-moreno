@@ -1,0 +1,140 @@
+---
+import Base from '@/layouts/Base.astro';
+import ThemeToggle from '@/components/ThemeToggle.astro';
+import { profile } from '@/data/profile';
+import { links, isInternal, relFor } from '@/data/links';
+
+/**
+ * Página de enlaces. Vive en /links de TU dominio y no en linktr.ee:
+ * así el tráfico y los enlaces entrantes acumulan autoridad aquí.
+ *
+ * Estática a propósito: el tracking va desde el cliente contra
+ * /api/click, así que esta página se sirve desde el CDN igual que antes.
+ */
+export const prerender = true;
+
+const origin = Astro.site?.origin ?? '';
+const title = `Enlaces · ${profile.name}`;
+const description = `Todos los enlaces de ${profile.name}, ${profile.role.toLowerCase()} en ${profile.city}, ${profile.country}: CV, blog técnico, apuntes de Flutter, GitHub y contacto.`;
+---
+
+<Base
+  title={title}
+  description={description}
+  path="/links"
+  schema={[
+    {
+      '@type': 'ProfilePage',
+      '@id': `${origin}/links#profilepage`,
+      name: title,
+      mainEntity: { '@id': `${origin}/#person` },
+    },
+    {
+      '@type': 'ItemList',
+      name: `Enlaces de ${profile.name}`,
+      numberOfItems: links.length,
+      itemListOrder: 'https://schema.org/ItemListOrderAscending',
+      itemListElement: links.map((link, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: link.label,
+        url: isInternal(link.url) ? `${origin}${link.url}` : link.url,
+      })),
+    },
+  ]}
+>
+  <main
+    id="main"
+    class="mx-auto flex min-h-dvh w-full max-w-[34rem] flex-col px-[var(--pad)] py-10"
+  >
+    <div class="mb-6 flex justify-end">
+      <ThemeToggle />
+    </div>
+
+    <header class="border-2 border-ink p-6 text-center">
+      <div
+        class="mx-auto grid size-16 place-items-center rounded-full border-[3px] border-red font-impact text-xl font-black text-red"
+        aria-hidden="true"
+      >
+        {profile.initials}
+      </div>
+      <h1 class="mt-4 text-[clamp(1.5rem,7vw,2.25rem)] leading-[0.95] font-black">
+        {profile.name}
+      </h1>
+      <p class="mt-2 mb-0 font-mono text-[0.625rem] tracking-[0.14em] text-slate uppercase">
+        {profile.role} · {profile.city}, {profile.country}
+      </p>
+      <p class="mt-3 mb-0 font-read text-[0.9375rem] italic">{profile.tagline}</p>
+    </header>
+
+    <h2 class="sr-only">Enlaces</h2>
+    <ul id="link-list" class="m-0 mt-6 flex list-none flex-col gap-3 p-0">
+      {
+        links.map((link) => (
+          <li>
+            <a
+              href={link.url}
+              rel={relFor(link)}
+              target={isInternal(link.url) ? undefined : '_blank'}
+              data-link-label={link.label}
+              class:list={[
+                'flex w-full items-center gap-3 border-2 border-ink px-4 py-4 no-underline transition-[transform,box-shadow] duration-200',
+                'hover:-translate-x-0.5 hover:-translate-y-0.5 motion-reduce:transform-none',
+                link.featured
+                  ? 'bg-ink text-paper shadow-[4px_4px_0_0_var(--color-red)] hover:shadow-[6px_6px_0_0_var(--color-red)]'
+                  : 'bg-paper shadow-[4px_4px_0_0_var(--color-tone)] hover:shadow-[6px_6px_0_0_var(--color-tone)]',
+              ]}
+            >
+              <span class="min-w-0 flex-1">
+                <span class="block font-impact text-lg leading-none font-extrabold uppercase">
+                  {link.label}
+                </span>
+                {link.description && (
+                  <span
+                    class:list={[
+                      'mt-1.5 block font-mono text-[0.5625rem] tracking-[0.06em]',
+                      link.featured ? 'text-paper/70' : 'text-slate',
+                    ]}
+                  >
+                    {link.description}
+                  </span>
+                )}
+              </span>
+              <span class="shrink-0 font-mono text-sm" aria-hidden="true">
+                {isInternal(link.url) ? '→' : '↗'}
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    {
+      /*
+      Texto propio: una página que solo son botones es contenido pobre
+      para Google. Esto le da algo real que indexar.
+    */
+    }
+    <section class="mt-10 border-t-2 border-ink pt-6">
+      <h2 class="text-sm tracking-[0.1em]">Sobre mi trabajo</h2>
+      <p class="mt-2 mb-0 text-[0.9375rem] text-slate">
+        Llevo más de tres años construyendo apps móviles en Flutter con Dart, BLoC y Clean
+        Architecture. Mi especialidad es la persistencia offline: colas de sincronización con
+        SQLite, estados de carga honestos y datos que sobreviven a un cierre forzado. Si buscas algo
+        concreto, la vía más rápida es el correo.
+      </p>
+    </section>
+
+    <footer class="mt-auto pt-10 text-center">
+      <a
+        href="/"
+        class="font-mono text-[0.625rem] tracking-[0.1em] text-slate uppercase no-underline hover:text-ink"
+      >
+        ← Ver el portafolio completo
+      </a>
+    </footer>
+  </main>
+
+  {/* Astro lo compila y minifica: unos 400 bytes, sin dependencias */}
+  <script src="../../scripts/track-clicks.ts"></script>
+</Base>

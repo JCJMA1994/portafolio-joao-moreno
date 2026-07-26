@@ -1,0 +1,58 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '@/layouts/Base.astro';
+import Nav from '@/components/Nav.astro';
+import Footer from '@/components/Footer.astro';
+import TitleCard from '@/components/TitleCard.astro';
+import PostCard from '@/components/PostCard.astro';
+import { readingTime } from '@/lib/utils';
+import { profile } from '@/data/profile';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  const tags = [...new Set(posts.flatMap((p) => p.data.tags))];
+  return tags.map((tag) => ({
+    params: { tag },
+    props: {
+      tag,
+      posts: posts
+        .filter((p) => p.data.tags.includes(tag))
+        .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()),
+    },
+  }));
+}
+
+const { tag, posts } = Astro.props;
+---
+
+<Base
+  title={`${tag} · Blog de ${profile.name}`}
+  description={`Artículos sobre ${tag}: ${posts.length} entradas escritas por ${profile.name}, desarrollador Flutter especializado en apps offline-first.`}
+  path={`/blog/tag/${tag}`}
+>
+  <Nav />
+  <main id="main" class="mx-auto max-w-[80rem] px-[var(--pad)] py-16 sm:py-24">
+    <TitleCard ep={1} title={tag} meta={`${posts.length} artículos`} />
+    <a
+      href="/blog"
+      class="mb-8 inline-block font-mono text-[0.625rem] tracking-[0.1em] text-slate uppercase no-underline hover:text-ink"
+    >
+      ← Todos los artículos
+    </a>
+    <ul class="m-0 list-none p-0">
+      {
+        posts.map((post) => (
+          <PostCard
+            slug={post.id}
+            title={post.data.title}
+            description={post.data.description}
+            pubDate={post.data.pubDate}
+            minutes={readingTime(post.body ?? '')}
+            tags={post.data.tags}
+          />
+        ))
+      }
+    </ul>
+  </main>
+  <Footer />
+</Base>

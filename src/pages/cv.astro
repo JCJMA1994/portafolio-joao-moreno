@@ -1,0 +1,143 @@
+---
+import Base from '@/layouts/Base.astro';
+import {
+  profile,
+  skillGroups,
+  education,
+  certifications,
+  languages,
+  socials,
+} from '@/data/profile';
+import { changelog } from '@/data/changelog';
+
+/**
+ * Versión sobria e imprimible. Sin screentone, sin animaciones, sin
+ * simulador: es el documento que un reclutador de banca o consultora
+ * imprime o adjunta a una candidatura. noindex para que no compita
+ * con la home en resultados de búsqueda.
+ */
+const experience = changelog.filter(
+  (e) =>
+    e.org &&
+    !e.org.includes('certificación') &&
+    !e.org.includes('Microsoft') &&
+    !e.org.includes('Universidad'),
+);
+---
+
+<Base title={`CV · ${profile.name}`} description={profile.seoDescription} path="/cv" noindex plain>
+  <main id="main" class="mx-auto max-w-[52rem] px-[var(--pad)] py-12 print:py-0">
+    <div class="no-print mb-10 flex flex-wrap gap-2.5">
+      <a href="/" class="btn btn-ghost">← Volver</a>
+      <button type="button" class="btn btn-solid" id="print-cv">Imprimir o guardar en PDF</button>
+    </div>
+
+    <header class="border-b-2 border-ink pb-5">
+      <h1 class="text-[clamp(1.75rem,6vw,3rem)] leading-[0.95] font-black">{profile.name}</h1>
+      <p class="mt-2 mb-3 font-mono text-[0.6875rem] tracking-[0.14em] uppercase">{profile.role}</p>
+      <p class="m-0 font-mono text-[0.6875rem] text-slate">
+        {profile.city}, {profile.region}, {profile.country} ·
+        <a href={`tel:${profile.phone}`}>{profile.phoneDisplay}</a> ·
+        <a href={`mailto:${profile.email}`}>{profile.email}</a><br />
+        {
+          socials.map((s) => (
+            <a href={s.url} class="mr-3">
+              {s.label}
+            </a>
+          ))
+        }
+      </p>
+    </header>
+
+    <section class="mt-8">
+      <h2 class="mb-3 border-b border-tone pb-1 text-base tracking-[0.1em]">Perfil profesional</h2>
+      <p class="m-0 text-[0.9375rem]">{profile.seoDescription}</p>
+    </section>
+
+    <section class="mt-8">
+      <h2 class="mb-4 border-b border-tone pb-1 text-base tracking-[0.1em]">Experiencia laboral</h2>
+      {
+        experience.map((job) => (
+          <div class="mb-6 break-inside-avoid">
+            <div class="flex flex-wrap items-baseline justify-between gap-2">
+              <h3 class="text-base">
+                {job.role} — {job.org}
+              </h3>
+              <span class="font-mono text-[0.625rem] tracking-[0.1em] text-slate uppercase">
+                {job.date}
+              </span>
+            </div>
+            {job.added && (
+              <ul class="mt-2 mb-0 list-disc pl-5 text-[0.9375rem]">
+                {job.added.map((item) => (
+                  <li class="mb-1">{item}</li>
+                ))}
+              </ul>
+            )}
+          </div>
+        ))
+      }
+    </section>
+
+    <section class="mt-8 break-inside-avoid">
+      <h2 class="mb-3 border-b border-tone pb-1 text-base tracking-[0.1em]">
+        Habilidades técnicas
+      </h2>
+      <dl class="m-0 grid gap-2 text-[0.9375rem]">
+        {
+          skillGroups.map((group) => (
+            <div class="grid gap-1 sm:grid-cols-[9rem_1fr] sm:gap-4">
+              <dt class="font-mono text-[0.6875rem] tracking-[0.08em] uppercase">{group.group}</dt>
+              <dd class="m-0">{group.items}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </section>
+
+    <section class="mt-8 break-inside-avoid">
+      <h2 class="mb-3 border-b border-tone pb-1 text-base tracking-[0.1em]">Educación</h2>
+      {
+        education.map((item) => (
+          <div class="flex flex-wrap items-baseline justify-between gap-2">
+            <p class="m-0 text-[0.9375rem]">
+              <strong>{item.title}</strong> — {item.org}
+            </p>
+            <span class="font-mono text-[0.625rem] tracking-[0.1em] text-slate uppercase">
+              {item.date}
+            </span>
+          </div>
+        ))
+      }
+    </section>
+
+    <section class="mt-8 break-inside-avoid">
+      <h2 class="mb-3 border-b border-tone pb-1 text-base tracking-[0.1em]">Certificaciones</h2>
+      <ul class="m-0 list-none p-0 text-[0.9375rem]">
+        {
+          certifications.map((cert) => (
+            <li class="mb-2 flex flex-wrap items-baseline justify-between gap-2">
+              <span>
+                {cert.title} — {cert.org}
+              </span>
+              <span class="font-mono text-[0.625rem] tracking-[0.1em] text-slate uppercase">
+                {cert.date}
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="mt-8 break-inside-avoid">
+      <h2 class="mb-3 border-b border-tone pb-1 text-base tracking-[0.1em]">Idiomas</h2>
+      <p class="m-0 text-[0.9375rem]">
+        {languages.map((lang) => `${lang.name} (${lang.level})`).join(' · ')}
+      </p>
+    </section>
+  </main>
+</Base>
+
+<script>
+  document.getElementById('print-cv')?.addEventListener('click', () => window.print());
+</script>

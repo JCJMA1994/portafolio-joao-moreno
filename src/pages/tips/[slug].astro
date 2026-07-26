@@ -1,0 +1,68 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '@/layouts/Base.astro';
+import Nav from '@/components/Nav.astro';
+import Footer from '@/components/Footer.astro';
+import { formatDate, isoDate, deservesOwnPage } from '@/lib/utils';
+import { profile } from '@/data/profile';
+
+/**
+ * Solo generamos página propia para los apuntes que superan el umbral
+ * de palabras. Los cortos viven en /tips y no crean URLs pobres.
+ */
+export async function getStaticPaths() {
+  const tips = await getCollection('tips', ({ data }) => !data.draft);
+  return tips
+    .filter((tip) => deservesOwnPage(tip.body ?? ''))
+    .map((tip) => ({ params: { slug: tip.id }, props: { tip } }));
+}
+
+const { tip } = Astro.props;
+const { Content } = await render(tip);
+const origin = Astro.site?.origin ?? '';
+const num = String(tip.data.number).padStart(3, '0');
+---
+
+<Base
+  title={`#${num} ${tip.data.title} · Apuntes`}
+  description={`Apunte ${num} sobre ${tip.data.tag}: ${tip.data.title}. Por ${profile.name}, desarrollador Flutter.`}
+  path={`/tips/${tip.id}`}
+  schema={[
+    {
+      '@type': 'TechArticle',
+      '@id': `${origin}/tips/${tip.id}#article`,
+      headline: tip.data.title,
+      datePublished: tip.data.pubDate.toISOString(),
+      keywords: tip.data.tag,
+      inLanguage: 'es-PE',
+      author: { '@id': `${origin}/#person` },
+    },
+  ]}
+>
+  <Nav />
+  <main id="main" class="mx-auto max-w-[80rem] px-[var(--pad)] py-12 sm:py-20">
+    <nav
+      aria-label="Ruta de navegación"
+      class="mb-8 font-mono text-[0.625rem] tracking-[0.1em] text-slate uppercase"
+    >
+      <a href="/" class="no-underline hover:text-ink">Inicio</a> /
+      <a href="/tips" class="no-underline hover:text-ink">Apuntes</a> /
+      <span>#{num}</span>
+    </nav>
+
+    <article>
+      <header class="mb-8 border-b-2 border-ink pb-5">
+        <span class="font-impact text-5xl leading-none font-black text-red">{num}</span>
+        <h1 class="mt-2 max-w-[26ch] text-[clamp(1.75rem,6vw,3.5rem)] leading-[0.95] font-black">
+          {tip.data.title}
+        </h1>
+        <p class="mt-4 mb-0 font-mono text-[0.625rem] tracking-[0.12em] text-slate uppercase">
+          <time datetime={isoDate(tip.data.pubDate)}>{formatDate(tip.data.pubDate)}</time>
+          · {tip.data.tag}
+        </p>
+      </header>
+      <div class="prose-manga"><Content /></div>
+    </article>
+  </main>
+  <Footer />
+</Base>

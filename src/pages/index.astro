@@ -1,0 +1,374 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '@/layouts/Base.astro';
+import Nav from '@/components/Nav.astro';
+import Footer from '@/components/Footer.astro';
+import TitleCard from '@/components/TitleCard.astro';
+import Changelog from '@/components/Changelog.astro';
+import Ticker from '@/components/Ticker.astro';
+import StackTree from '@/components/StackTree.astro';
+import PostCard from '@/components/PostCard.astro';
+import TipCard from '@/components/TipCard.astro';
+import OfflineDemo from '@/components/OfflineDemo';
+import { profile, icebreakers } from '@/data/profile';
+import { featured, archive, versionLegend } from '@/data/changelog';
+import { readingTime, deservesOwnPage } from '@/lib/utils';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 3);
+
+const tips = (await getCollection('tips', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.number - a.data.number)
+  .slice(0, 4);
+
+const projects = (await getCollection('work', ({ data }) => !data.draft)).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+
+const allTips = await getCollection('tips', ({ data }) => !data.draft);
+const allPosts = await getCollection('blog', ({ data }) => !data.draft);
+
+const title = `${profile.name} · ${profile.role}`;
+---
+
+<Base
+  title={title}
+  description={profile.seoDescription}
+  path="/"
+  schema={[
+    {
+      '@type': 'ProfilePage',
+      '@id': `${Astro.site?.origin ?? ''}/#profilepage`,
+      mainEntity: { '@id': `${Astro.site?.origin ?? ''}/#person` },
+    },
+  ]}
+>
+  <Nav />
+
+  <main id="main">
+    <!-- ══════════════ HERO ══════════════ -->
+    <header class="mx-auto max-w-[80rem] px-[var(--pad)] pt-6 pb-16 sm:pt-10 sm:pb-24">
+      <div class="grid border-2 border-ink lg:grid-cols-[1.55fr_1fr]">
+        <div
+          class="relative overflow-hidden border-b-2 border-ink p-5 sm:p-10 lg:border-r-2 lg:border-b-0"
+        >
+          <p
+            class="m-0 mb-6 inline-flex items-center gap-2.5 font-mono text-[0.625rem] font-medium tracking-[0.14em] text-slate uppercase"
+          >
+            <span class="status-dot size-1.5 bg-red" aria-hidden="true"></span>
+            {profile.availableLabel}
+          </p>
+
+          <h1
+            class="m-0 mb-5 font-impact text-[clamp(3.25rem,15vw,9rem)] leading-[0.82] font-black tracking-[0.002em]"
+          >
+            <span class="line-mask"><span>{profile.firstLine}</span></span>
+            <span class="line-mask" style="animation-delay:.14s"
+              ><span style="animation-delay:.14s">{profile.secondLine}</span></span
+            >
+          </h1>
+
+          <p
+            class="fade-in m-0 mb-7 border-b border-tone pb-5 font-mono text-[0.6875rem] font-medium tracking-[0.2em] uppercase"
+            style="animation-delay:.5s"
+          >
+            {profile.role} · {profile.city}, {profile.country} · Remoto
+          </p>
+
+          <p
+            class="fade-in m-0 mb-8 max-w-[30ch] font-read text-[clamp(1.15rem,2.9vw,1.625rem)] leading-[1.4] italic"
+            style="animation-delay:.6s"
+          >
+            Construyo apps que <span class="marker marker-swipe">siguen funcionando sin señal</span
+            >.
+          </p>
+
+          <div class="fade-in flex flex-wrap gap-2.5" style="animation-delay:.75s">
+            <a class="btn btn-solid" href="#contacto">Escríbeme</a>
+            <a class="btn btn-ghost" href="/cv">Ver mi CV</a>
+          </div>
+
+          <!-- Sello hanko: firma la página -->
+          <div
+            class="stamp absolute right-8 bottom-8 hidden size-18 place-items-center rounded-full border-[3px] border-red font-impact text-2xl font-black tracking-[0.02em] text-red lg:grid"
+            aria-hidden="true"
+          >
+            {profile.initials}
+          </div>
+        </div>
+
+        <!--
+          client:visible: el simulador solo se hidrata cuando entra en
+          pantalla. Es el único JavaScript de componente del sitio.
+        -->
+        <OfflineDemo client:visible />
+      </div>
+    </header>
+  </main>
+
+  <Ticker
+    items={[
+      'Flutter',
+      'Dart',
+      'BLoC / Cubit',
+      'Clean Architecture',
+      'SQLite offline',
+      'Firebase',
+      'Kotlin',
+    ]}
+  />
+
+  <div class="mx-auto max-w-[80rem] px-[var(--pad)]">
+    <!-- ══════════════ 01 TRAYECTO ══════════════ -->
+    <section id="trayecto" class="reveal py-16 sm:py-24">
+      <TitleCard ep={1} title="Trayecto" meta="2 empresas · 3 años" />
+      <Changelog entries={featured} />
+
+      <details class="mt-8 group">
+        <summary
+          class="cursor-pointer list-none border-2 border-ink px-4 py-3 font-mono text-[0.6875rem] font-semibold tracking-[0.1em] text-slate uppercase transition-colors hover:bg-ink hover:text-paper"
+        >
+          <span class="group-open:hidden">▾ Ver historial completo</span>
+          <span class="hidden group-open:inline">▴ Ocultar historial</span>
+        </summary>
+        <div class="mt-6">
+          <Changelog entries={archive} static />
+        </div>
+      </details>
+
+      <dl class="mt-6 grid gap-1 font-mono text-[0.625rem] tracking-[0.06em] text-slate">
+        {
+          versionLegend.map((item) => (
+            <div class="flex gap-3">
+              <dt class="w-12 font-semibold uppercase">{item.level}</dt>
+              <dd class="m-0">{item.meaning}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </section>
+
+    <!-- ══════════════ 02 TRABAJO ══════════════ -->
+    <section class="reveal py-16 sm:py-24">
+      <TitleCard ep={2} title="Trabajo" meta={`${projects.length} proyectos`} />
+      <div class="grid border-2 border-ink md:grid-cols-2">
+        {
+          projects.map((project, i) => (
+            <article
+              class:list={[
+                'flex flex-col gap-3.5 p-6 transition-colors hover:screentone',
+                i === 0 && 'border-b-2 border-ink md:border-r-2 md:border-b-0',
+              ]}
+            >
+              <p class="m-0 font-mono text-[0.5rem] leading-[1.7] tracking-[0.16em] text-red uppercase">
+                {project.data.kind}
+              </p>
+              <div
+                class="grid aspect-[16/10] place-items-center border border-tone font-mono text-[0.5rem] tracking-[0.16em] text-slate uppercase"
+                style="background:repeating-linear-gradient(135deg,var(--color-tone) 0 1px,transparent 1px 11px)"
+              >
+                captura de la app
+              </div>
+              <h3 class="text-xl">
+                {project.data.title} · {project.data.org}
+              </h3>
+              <p class="m-0 font-mono text-[0.5625rem] tracking-[0.1em] text-slate uppercase">
+                {project.data.stack.join(' · ')}
+              </p>
+              <p class="m-0 text-[0.9375rem]">
+                {project.data.summary}
+                {project.data.outcome && (
+                  <span class="bg-red px-1.5 font-mono text-[0.8em] text-paper">
+                    {project.data.outcome}
+                  </span>
+                )}
+              </p>
+              <a
+                href={`/trabajo/${project.id}`}
+                class="mt-auto self-start border-b-2 border-red pb-0.5 font-mono text-[0.625rem] font-semibold tracking-[0.1em] uppercase no-underline"
+              >
+                Caso completo
+              </a>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- ══════════════ 03 ESCRITURA ══════════════ -->
+    <section class="reveal py-16 sm:py-24">
+      <TitleCard
+        ep={3}
+        title="Escritura"
+        meta={`${allPosts.length} artículos · ${allTips.length} apuntes`}
+      />
+
+      <div class="mb-5 flex items-baseline justify-between gap-4 border-b border-tone pb-2">
+        <h3 class="text-base tracking-[0.06em]">Artículos</h3>
+        <a
+          href="/blog"
+          class="font-mono text-[0.5625rem] font-semibold tracking-[0.12em] text-red uppercase no-underline hover:underline"
+          >Ver todos</a
+        >
+      </div>
+      <ul class="m-0 mb-14 list-none p-0">
+        {
+          posts.map((post) => (
+            <PostCard
+              slug={post.id}
+              title={post.data.title}
+              description={post.data.description}
+              pubDate={post.data.pubDate}
+              minutes={readingTime(post.body ?? '')}
+              tags={post.data.tags}
+            />
+          ))
+        }
+      </ul>
+
+      <div class="mb-5 flex items-baseline justify-between gap-4 border-b border-tone pb-2">
+        <h3 class="text-base tracking-[0.06em]">Apuntes</h3>
+        <a
+          href="/tips"
+          class="font-mono text-[0.5625rem] font-semibold tracking-[0.12em] text-red uppercase no-underline hover:underline"
+          >Ver todos</a
+        >
+      </div>
+      <ul class="m-0 grid list-none border-2 border-ink p-0 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          tips.map((tip) => (
+            <TipCard
+              number={tip.data.number}
+              title={tip.data.title}
+              tag={tip.data.tag}
+              minutes={readingTime(tip.body ?? '')}
+              href={deservesOwnPage(tip.body ?? '') ? `/tips/${tip.id}` : undefined}
+            />
+          ))
+        }
+      </ul>
+    </section>
+
+    <!-- ══════════════ 04 STACK ══════════════ -->
+    <section class="reveal py-16 sm:py-24">
+      <TitleCard ep={4} title="Stack" meta="qué uso y por qué" />
+      <StackTree />
+    </section>
+
+    <!-- ══════════════ 05 SOBRE MÍ ══════════════ -->
+    <section class="reveal py-16 sm:py-24">
+      <TitleCard ep={5} title="Sobre mí" />
+      <div class="grid border-2 border-ink md:grid-cols-[14rem_1fr]">
+        <div
+          class="grid aspect-[4/5] place-items-center border-b-2 border-ink p-4 text-center font-mono text-[0.5rem] tracking-[0.16em] text-slate uppercase md:aspect-auto md:border-r-2 md:border-b-0"
+          style="background:repeating-linear-gradient(135deg,var(--color-tone) 0 1px,transparent 1px 12px)"
+        >
+          foto 4:5<br />o quitar
+        </div>
+        <div class="p-6">
+          {profile.bio.map((para) => <p class="mb-4 max-w-[62ch] last:mb-0">{para}</p>)}
+          <p class="mt-4 mb-0 max-w-[62ch]">
+            Ahora busco <span class="marker marker-on">{profile.seeking}</span>{profile.seekingRest}
+          </p>
+        </div>
+      </div>
+
+      <dl class="mt-8 grid border-2 border-ink md:grid-cols-3">
+        {
+          icebreakers.map((item, i) => (
+            <div
+              class:list={[
+                'border-b border-tone px-5 py-4 md:border-b-0',
+                i < icebreakers.length - 1 && 'md:border-r',
+              ]}
+            >
+              <dt class="mb-1.5 font-mono text-[0.5rem] tracking-[0.16em] text-red uppercase">
+                {item.term}
+              </dt>
+              <dd class="m-0 text-[0.9375rem] leading-[1.5]">{item.def}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </section>
+
+    <!-- ══════════════ CONTACTO ══════════════ -->
+    <section id="contacto" class="reveal py-16 sm:py-24">
+      <TitleCard ep="final" title="Contacto" />
+      <p class="m-0 max-w-[40ch]">Escríbeme y te contesto en 24 horas.</p>
+      <a
+        href={`mailto:${profile.email}`}
+        class="my-6 inline-block font-impact text-[clamp(1.5rem,6.5vw,4rem)] leading-[0.92] font-black break-words uppercase no-underline transition-colors hover:text-red"
+      >
+        {profile.email}
+      </a>
+      <ul class="m-0 flex list-none flex-wrap gap-x-7 gap-y-2 p-0">
+        <li>
+          <a
+            href="https://github.com/JCJMA1994"
+            rel="me noopener"
+            class="font-mono text-[0.6875rem] font-semibold tracking-[0.1em] text-slate uppercase no-underline hover:text-ink"
+            >GitHub ↗</a
+          >
+        </li>
+        <li>
+          <a
+            href="https://www.linkedin.com/in/jcjma1994/"
+            rel="me noopener"
+            class="font-mono text-[0.6875rem] font-semibold tracking-[0.1em] text-slate uppercase no-underline hover:text-ink"
+            >LinkedIn ↗</a
+          >
+        </li>
+        <li>
+          <a
+            href={`tel:${profile.phone}`}
+            class="font-mono text-[0.6875rem] font-semibold tracking-[0.1em] text-slate uppercase no-underline hover:text-ink"
+            >{profile.phoneDisplay}</a
+          >
+        </li>
+        <li>
+          <a
+            href="/rss.xml"
+            class="font-mono text-[0.6875rem] font-semibold tracking-[0.1em] text-slate uppercase no-underline hover:text-ink"
+            >RSS</a
+          >
+        </li>
+      </ul>
+    </section>
+  </div>
+
+  <Footer />
+</Base>
+
+<style>
+  .status-dot {
+    animation: status-blink 1.8s steps(1) infinite;
+  }
+  @keyframes status-blink {
+    0%,
+    60% {
+      opacity: 1;
+    }
+    61%,
+    100% {
+      opacity: 0.25;
+    }
+  }
+
+  .stamp {
+    transform: rotate(-11deg);
+    opacity: 0;
+    animation: stamp-in 0.5s var(--ease-out-expo) 1.4s forwards;
+  }
+  @keyframes stamp-in {
+    from {
+      opacity: 0;
+      transform: rotate(-11deg) scale(1.7);
+    }
+    to {
+      opacity: 0.9;
+      transform: rotate(-11deg) scale(1);
+    }
+  }
+</style>

@@ -1,0 +1,246 @@
+---
+import Base from '@/layouts/Base.astro';
+import ThemeToggle from '@/components/ThemeToggle.astro';
+import type { Row } from '@libsql/client';
+import { getDb } from '@/lib/db';
+import { links } from '@/data/links';
+import { profile } from '@/data/profile';
+
+// Datos en vivo. El middleware ya exige Basic Auth y añade no-store.
+export const prerender = false;
+
+const DAYS = 30;
+const db = getDb();
+
+let configured = db !== null;
+let total = 0;
+let last7 = 0;
+let byLabel: { label: string; total: number }[] = [];
+let byDevice: { device: string; total: number }[] = [];
+let byReferrer: { referrer: string; total: number }[] = [];
+let daily: { key: string; label: string; total: number }[] = [];
+let error: string | null = null;
+
+if (db) {
+  try {
+    // Agregados en SQL: escala aunque tengas cientos de miles de filas.
+    const [totals, labels, devices, referrers, series] = await Promise.all([
+      db.execute(`
+        SELECT COUNT(*) AS total,
+               SUM(CASE WHEN created_at >= datetime('now', '-7 days') THEN 1 ELSE 0 END) AS last7
+        FROM click
+      `),
+      db.execute('SELECT label, COUNT(*) AS total FROM click GROUP BY label ORDER BY total DESC'),
+      db.execute('SELECT device, COUNT(*) AS total FROM click GROUP BY device'),
+      db.execute(
+        'SELECT referrer, COUNT(*) AS total FROM click GROUP BY referrer ORDER BY total DESC LIMIT 6',
+      ),
+      // Agrupamos por día en SQL con strftime, no en memoria: así el
+      // panel sigue siendo rápido con muchos registros.
+      db.execute({
+        sql: `SELECT strftime('%Y-%m-%d', created_at) AS day, COUNT(*) AS total
+              FROM click
+              WHERE created_at >= datetime('now', ?)
+              GROUP BY day`,
+        args: [`-${DAYS} days`],
+      }),
+    ]);
+
+    const t: Row | undefined = totals.rows[0];
+    total = Number(t?.total ?? 0);
+    last7 = Number(t?.last7 ?? 0);
+
+    byLabel = labels.rows.map((r: Row) => ({ label: String(r.label), total: Number(r.total) }));
+    byDevice = devices.rows.map((r: Row) => ({
+      device: String(r.device ?? 'desconocido'),
+      total: Number(r.total),
+    }));
+    byReferrer = referrers.rows.map((r: Row) => ({
+      referrer: String(r.referrer ?? 'sin referrer'),
+      total: Number(r.total),
+    }));
+
+    const seriesMap = new Map(series.rows.map((r: Row) => [String(r.day), Number(r.total)]));
+    daily = Array.from({ length: DAYS }, (_, i) => {
+      const date = new Date(Date.now() - (DAYS - 1 - i) * 86_400_000);
+      const key = date.toISOString().slice(0, 10);
+      return {
+        key,
+        label: date.toLocaleDateString('es-PE', { day: 'numeric', month: 'short' }),
+        total: seriesMap.get(key) ?? 0,
+      };
+    });
+  } catch (e) {
+    // Lo más habitual: la tabla no existe todavía.
+    error = e instanceof Error ? e.message : 'Error desconocido';
+    configured = false;
+  }
+}
+
+const peak = Math.max(1, ...daily.map((d) => d.total));
+const maxLabel = Math.max(1, ...byLabel.map((r) => r.total));
+const clicked = new Set(byLabel.map((r) => r.label));
+const untouched = links.filter((link) => !clicked.has(link.label));
+const pct = (n: number) => (total ? Math.round((n / total) * 100) : 0);
+---
+
+<Base
+  title={`Estadísticas · ${profile.name}`}
+  description="Panel privado de clics en los enlaces."
+  path="/links/stats"
+  noindex
+  plain
+>
+  <main id="main" class="mx-auto w-full max-w-3xl px-[var(--pad)] py-10">
+    <div class="flex items-start justify-between gap-4 border-b-2 border-ink pb-4">
+      <div>
+        <h1 class="text-2xl font-black">Clics en tus enlaces</h1>
+        <p class="mt-1.5 mb-0 font-mono text-[0.625rem] tracking-[0.1em] text-slate uppercase">
+          Últimos {DAYS} días · sin cookies ni datos personales
+        </p>
+      </div>
+      <ThemeToggle />
+    </div>
+
+    {
+      !configured && (
+        <div class="panel mt-8 p-6">
+          <h2 class="text-lg">Tracking sin configurar</h2>
+          <p class="mt-3 mb-0 text-[0.9375rem]">
+            {error
+              ? 'La base de datos responde pero la consulta falló. Lo más probable es que falte crear la tabla.'
+              : 'Faltan las variables TURSO_DATABASE_URL y TURSO_AUTH_TOKEN.'}
+          </p>
+          {error && (
+            <pre class="mt-4 overflow-x-auto border-2 border-ink p-3 font-mono text-[0.6875rem]">
+              {error}
+            </pre>
+          )}
+          <p class="mt-4 mb-0 font-mono text-[0.75rem]">
+            Instrucciones completas en el README, sección «Tracking de enlaces».
+          </p>
+        </div>
+      )
+    }
+
+    {
+      configured && (
+        <>
+          <dl class="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {[
+              { label: 'Clics totales', value: total.toLocaleString('es-PE') },
+              { label: 'Últimos 7 días', value: last7.toLocaleString('es-PE') },
+              { label: 'Enlaces activos', value: `${clicked.size} de ${links.length}` },
+            ].map((stat) => (
+              <div class="panel p-4">
+                <dt class="font-mono text-[0.5rem] tracking-[0.14em] text-slate uppercase">
+                  {stat.label}
+                </dt>
+                <dd class="mt-1.5 mb-0 font-impact text-3xl font-black tabular-nums">
+                  {stat.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
+
+          <section class="mt-12">
+            <h2 class="text-base tracking-[0.1em]">Evolución diaria</h2>
+            <div
+              class="mt-4 flex h-32 items-end gap-[3px] border-b-2 border-ink"
+              role="img"
+              aria-label={`Clics por día durante los últimos ${DAYS} días`}
+            >
+              {daily.map((day) => (
+                <div
+                  class="group relative flex-1 bg-tone transition-colors hover:bg-red"
+                  style={`height: ${Math.max(2, (day.total / peak) * 100)}%`}
+                >
+                  <span class="pointer-events-none absolute -top-8 left-1/2 hidden -translate-x-1/2 border-2 border-ink bg-ink px-2 py-1 font-mono text-[0.5625rem] whitespace-nowrap text-paper group-hover:block">
+                    {day.label}: {day.total}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div class="mt-2 flex justify-between font-mono text-[0.5625rem] text-slate">
+              <span>{daily[0]?.label}</span>
+              <span>{daily.at(-1)?.label}</span>
+            </div>
+          </section>
+
+          <section class="mt-12">
+            <h2 class="text-base tracking-[0.1em]">Por enlace</h2>
+            {byLabel.length === 0 ? (
+              <p class="mt-4 border-2 border-dashed border-tone p-6 text-center font-mono text-[0.75rem] text-slate">
+                Aún no hay clics registrados. Abre /links y pulsa algo para comprobarlo.
+              </p>
+            ) : (
+              <ol class="mt-4 list-none space-y-4 p-0">
+                {byLabel.map((row) => (
+                  <li>
+                    <div class="flex items-baseline justify-between gap-4">
+                      <span class="min-w-0 truncate font-impact text-base font-bold uppercase">
+                        {row.label}
+                      </span>
+                      <span class="shrink-0 font-mono text-[0.6875rem] text-slate tabular-nums">
+                        {row.total} · {pct(row.total)}%
+                      </span>
+                    </div>
+                    <div class="mt-1.5 h-2 border border-ink">
+                      <div
+                        class="h-full bg-red"
+                        style={`width: ${(row.total / maxLabel) * 100}%`}
+                      />
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            )}
+
+            {untouched.length > 0 && (
+              <p class="screentone mt-6 border-2 border-ink p-4 text-[0.875rem]">
+                <strong class="font-mono text-[0.6875rem] tracking-[0.1em] uppercase">
+                  Sin ningún clic:
+                </strong>{' '}
+                {untouched.map((l) => l.label).join(', ')}. Súbelos de posición o quítalos.
+              </p>
+            )}
+          </section>
+
+          <section class="mt-12 grid gap-8 sm:grid-cols-2">
+            <div>
+              <h2 class="text-base tracking-[0.1em]">Dispositivo</h2>
+              <ul class="mt-3 list-none space-y-2 p-0 font-mono text-[0.75rem]">
+                {byDevice.map((row) => (
+                  <li class="flex justify-between border-b border-tone pb-1">
+                    <span class="text-slate">{row.device}</span>
+                    <span class="tabular-nums">{pct(row.total)}%</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h2 class="text-base tracking-[0.1em]">Procedencia</h2>
+              <ul class="mt-3 list-none space-y-2 p-0 font-mono text-[0.75rem]">
+                {byReferrer.map((row) => (
+                  <li class="flex justify-between gap-3 border-b border-tone pb-1">
+                    <span class="truncate text-slate">{row.referrer}</span>
+                    <span class="shrink-0 tabular-nums">{row.total}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+        </>
+      )
+    }
+
+    <footer class="mt-16 border-t-2 border-ink pt-5">
+      <a
+        href="/links"
+        class="font-mono text-[0.6875rem] tracking-[0.1em] text-slate uppercase no-underline hover:text-ink"
+      >
+        ← Volver a tus enlaces
+      </a>
+    </footer>
+  </main>
+</Base>

@@ -1,0 +1,75 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '@/layouts/Base.astro';
+import Nav from '@/components/Nav.astro';
+import Footer from '@/components/Footer.astro';
+import TitleCard from '@/components/TitleCard.astro';
+import PostCard from '@/components/PostCard.astro';
+import { readingTime } from '@/lib/utils';
+import { profile } from '@/data/profile';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+
+// Las etiquetas son enlaces reales a páginas indexables, no filtros con JS.
+const tags = [...new Set(posts.flatMap((p) => p.data.tags))].sort();
+---
+
+<Base
+  title={`Blog · ${profile.name}`}
+  description="Escribo sobre Flutter, arquitectura offline-first, rendimiento y decisiones técnicas que salieron mal."
+  path="/blog"
+  schema={[
+    {
+      '@type': 'Blog',
+      '@id': `${Astro.site?.origin ?? ''}/blog#blog`,
+      name: `Blog de ${profile.name}`,
+      inLanguage: 'es-PE',
+      author: { '@id': `${Astro.site?.origin ?? ''}/#person` },
+    },
+  ]}
+>
+  <Nav />
+  <main id="main" class="mx-auto max-w-[80rem] px-[var(--pad)] py-16 sm:py-24">
+    <TitleCard ep={1} title="Blog" meta={`${posts.length} artículos`} />
+
+    <p class="mb-10 max-w-[46ch] font-impact text-[clamp(1.5rem,4vw,2.5rem)] leading-[1] uppercase">
+      Escribo sobre Flutter, arquitectura offline-first y decisiones que salieron mal.
+    </p>
+
+    <nav aria-label="Filtrar por etiqueta" class="mb-10 flex flex-wrap gap-2">
+      <span
+        class="border-2 border-ink bg-ink px-2.5 py-1 font-mono text-[0.5625rem] tracking-[0.1em] text-paper uppercase"
+      >
+        todos
+      </span>
+      {
+        tags.map((tag) => (
+          <a
+            href={`/blog/tag/${tag}`}
+            class="border-2 border-ink px-2.5 py-1 font-mono text-[0.5625rem] tracking-[0.1em] uppercase no-underline transition-colors hover:bg-ink hover:text-paper"
+          >
+            {tag}
+          </a>
+        ))
+      }
+    </nav>
+
+    <ul class="m-0 list-none p-0">
+      {
+        posts.map((post) => (
+          <PostCard
+            slug={post.id}
+            title={post.data.title}
+            description={post.data.description}
+            pubDate={post.data.pubDate}
+            minutes={readingTime(post.body ?? '')}
+            tags={post.data.tags}
+          />
+        ))
+      }
+    </ul>
+  </main>
+  <Footer />
+</Base>

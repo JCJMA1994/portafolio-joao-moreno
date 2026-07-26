@@ -1,0 +1,50 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '@/layouts/Base.astro';
+import Nav from '@/components/Nav.astro';
+import Footer from '@/components/Footer.astro';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('work', ({ data }) => !data.draft);
+  return projects.map((project) => ({ params: { slug: project.id }, props: { project } }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+---
+
+<Base
+  title={`${project.data.title} · ${project.data.org}`}
+  description={project.data.summary}
+  path={`/trabajo/${project.id}`}
+>
+  <Nav />
+  <main id="main" class="mx-auto max-w-[80rem] px-[var(--pad)] py-12 sm:py-20">
+    <nav
+      aria-label="Ruta de navegación"
+      class="mb-8 font-mono text-[0.625rem] tracking-[0.1em] text-slate uppercase"
+    >
+      <a href="/" class="no-underline hover:text-ink">Inicio</a> / <span>Trabajo</span>
+    </nav>
+
+    <article>
+      <header class="mb-10 border-b-2 border-ink pb-6">
+        <p class="m-0 font-mono text-[0.5625rem] tracking-[0.16em] text-red uppercase">
+          {project.data.kind}
+        </p>
+        <h1 class="mt-3 text-[clamp(2rem,7vw,4.5rem)] leading-[0.9] font-black">
+          {project.data.title}
+        </h1>
+        <p class="mt-4 mb-0 font-mono text-[0.625rem] tracking-[0.12em] text-slate uppercase">
+          {project.data.org} · {project.data.stack.join(' · ')}
+        </p>
+      </header>
+      <div class="prose-manga"><Content /></div>
+    </article>
+
+    <p class="mt-16">
+      <a href="/#contacto" class="btn btn-solid">Hablemos de tu proyecto</a>
+    </p>
+  </main>
+  <Footer />
+</Base>
