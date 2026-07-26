@@ -1,0 +1,7 @@
+dist
+node_modules
+.astro
+playwright-report
+test-results
+package-lock.json
+.vercel
