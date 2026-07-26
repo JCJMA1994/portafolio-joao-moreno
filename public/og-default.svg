@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <!-- Fondo: tinta, la base de la paleta de cuatro colores -->
+  <rect width="1200" height="630" fill="#0d0e11"/>
+
+  <!-- Screentone: trama de puntos, el gesto visual del sitio -->
+  <defs>
+    <pattern id="tone" width="14" height="14" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.1" fill="#c4c2ba" opacity="0.18"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#tone)"/>
+
+  <!-- Marco de sello -->
+  <rect x="40" y="40" width="1120" height="550" fill="none" stroke="#f2f0ea" stroke-width="3"/>
+
+  <!-- Insignia de iniciales, en rojo de sello -->
+  <circle cx="150" cy="150" r="52" fill="none" stroke="#e2565c" stroke-width="5"/>
+  <text x="150" y="170" font-family="Impact, 'Arial Black', sans-serif" font-size="48"
+        font-weight="900" text-anchor="middle" fill="#e2565c">JM</text>
+
+  <!-- Nombre -->
+  <text x="100" y="330" font-family="Impact, 'Arial Black', sans-serif" font-size="96"
+        font-weight="900" fill="#f2f0ea" letter-spacing="-2">Jose Carlos</text>
+  <text x="100" y="420" font-family="Impact, 'Arial Black', sans-serif" font-size="96"
+        font-weight="900" fill="#f2f0ea" letter-spacing="-2">Moreno Alemán</text>
+
+  <!-- Rol -->
+  <text x="104" y="490" font-family="'Courier New', monospace" font-size="26"
+        letter-spacing="6" fill="#9a9a94">DESARROLLADOR FLUTTER · CHIMBOTE, PERÚ</text>
+
+  <!-- Tagline, en la tipografía de lectura -->
+  <text x="100" y="545" font-family="Georgia, 'Times New Roman', serif" font-size="32"
+        font-style="italic" fill="#f2f0ea">Construyo apps que siguen funcionando sin señal.</text>
+</svg>

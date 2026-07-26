@@ -37,6 +37,11 @@ function challenge(): Response {
 }
 
 export const onRequest = defineMiddleware(async (context, next) => {
+  // Las páginas prerenderizadas (como /404) no tienen headers de request
+  // disponibles: leerlos dispara un warning en build. Como ninguna ruta
+  // protegida es estática, salimos temprano y evitamos tocar `request`.
+  if (context.isPrerendered) return next();
+
   const isProtected = PROTECTED.some((path) => context.url.pathname.startsWith(path));
   if (!isProtected) return next();
 
