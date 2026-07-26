@@ -1,0 +1,407 @@
+@import 'tailwindcss';
+
+/* ═══════════════════════════════════════════════════════════════
+   TOKENS — disciplina de manga impreso.
+   Cuatro colores: tinta, papel, gris de trama y rojo de sello.
+   El ESTADO se comunica con textura (screentone), no añadiendo
+   colores. Si te ves necesitando un quinto color, casi siempre
+   la respuesta correcta es una trama.
+   ═══════════════════════════════════════════════════════════════ */
+@theme {
+  --color-ink: #0d0e11;
+  --color-paper: #f7f5ef;
+  --color-tone: #c4c2ba;
+  --color-red: #c1272d;
+  --color-slate: #6b6b66;
+
+  --font-impact: 'Big Shoulders Display', Impact, sans-serif;
+  --font-read: 'Newsreader', Georgia, serif;
+  --font-mono: 'Martian Mono', ui-monospace, monospace;
+  --font-jp: 'Noto Sans JP', sans-serif;
+
+  --ease-out-expo: cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* En oscuro no invertimos mecánicamente: el rojo se aclara para
+   mantener contraste AA sobre fondo oscuro. */
+.dark {
+  --color-ink: #f2f0ea;
+  --color-paper: #101114;
+  --color-tone: #3a3b40;
+  --color-red: #e2565c;
+  --color-slate: #9a9a94;
+}
+
+@layer base {
+  /* Canal lateral único para toda la web. Todas las páginas usan
+     px-[var(--pad)], así que el ritmo horizontal se cambia aquí. */
+  :root {
+    --pad: 1rem;
+  }
+  @media (min-width: 40rem) {
+    :root {
+      --pad: 2rem;
+    }
+  }
+  @media (min-width: 64rem) {
+    :root {
+      --pad: 3.5rem;
+    }
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-read);
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    transition:
+      background-color 0.3s var(--ease-out-expo),
+      color 0.3s var(--ease-out-expo);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin: 0;
+    font-family: var(--font-impact);
+    font-weight: 800;
+    line-height: 0.95;
+    text-transform: uppercase;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  /* Foco visible siempre. No lo quites: es requisito de accesibilidad
+     y los tests de axe fallan el build si desaparece. */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  summary:focus-visible {
+    outline: 3px solid var(--color-red);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--color-red);
+    color: var(--color-paper);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* ── Screentone: la trama Ben-Day del manga ─────────────── */
+  .screentone {
+    background-image: radial-gradient(var(--color-tone) 1px, transparent 1.15px);
+    background-size: 6px 6px;
+  }
+  .screentone-fine {
+    background-image: radial-gradient(var(--color-tone) 0.9px, transparent 1px);
+    background-size: 4px 4px;
+  }
+  .tone-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.5;
+    background-image: radial-gradient(var(--color-tone) 0.9px, transparent 1px);
+    background-size: 5px 5px;
+  }
+  .dark .tone-overlay {
+    opacity: 0.35;
+  }
+
+  /* ── Panel: borde grueso, esquinas rectas, sin sombra difusa.
+        Es tinta sobre papel, no una tarjeta con elevación. ──── */
+  .panel {
+    border: 2px solid var(--color-ink);
+    background: var(--color-paper);
+    position: relative;
+  }
+
+  /* ── Botones. Sombra dura desplazada, nunca difusa. ─────── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 0.8rem 1.2rem;
+    border: 2px solid var(--color-ink);
+    cursor: pointer;
+    transition:
+      transform 0.18s var(--ease-out-expo),
+      box-shadow 0.18s var(--ease-out-expo);
+  }
+  .btn-solid {
+    background: var(--color-ink);
+    color: var(--color-paper);
+    box-shadow: 4px 4px 0 0 var(--color-red);
+  }
+  .btn-solid:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 0 var(--color-red);
+  }
+  .btn-ghost {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    box-shadow: 4px 4px 0 0 var(--color-tone);
+  }
+  .btn-ghost:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 0 var(--color-tone);
+  }
+
+  /* ── Rotulador. Aparece dos veces por página, no más. ───── */
+  .marker {
+    background-image: linear-gradient(
+      to right,
+      transparent 0,
+      var(--color-tone) 3%,
+      var(--color-tone) 97%,
+      transparent 100%
+    );
+    background-size: 0% 46%;
+    background-position: 0 74%;
+    background-repeat: no-repeat;
+    padding-inline: 0.12em;
+  }
+  .marker-on {
+    background-size: 100% 46%;
+  }
+  .marker-swipe {
+    animation: marker-swipe 0.6s var(--ease-out-expo) 1.15s forwards;
+  }
+  @keyframes marker-swipe {
+    to {
+      background-size: 100% 46%;
+    }
+  }
+
+  /* ── Líneas de concentración (集中線).
+        El recurso del manga para marcar tensión. Solo se usa en
+        el corte de red del simulador. ──────────────────────── */
+  .speedlines {
+    position: absolute;
+    inset: -40%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0;
+    background: repeating-conic-gradient(
+      from 0deg at 50% 50%,
+      var(--color-ink) 0deg 0.55deg,
+      transparent 0.55deg 3.2deg
+    );
+    -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 34%, #000 78%);
+    mask-image: radial-gradient(circle at 50% 50%, transparent 34%, #000 78%);
+    transition: opacity 0.45s var(--ease-out-expo);
+  }
+  .speedlines-on {
+    opacity: 0.16;
+    animation: speed-zoom 0.5s var(--ease-out-expo);
+  }
+  @keyframes speed-zoom {
+    from {
+      transform: scale(1.3) rotate(-4deg);
+    }
+    to {
+      transform: none;
+    }
+  }
+
+  /* ── Entrada de líneas de texto, tipo título de episodio ── */
+  .line-mask {
+    display: block;
+    overflow: hidden;
+  }
+  .line-mask > span {
+    display: block;
+    transform: translateY(102%);
+    animation: line-rise 0.85s var(--ease-out-expo) forwards;
+  }
+  @keyframes line-rise {
+    to {
+      transform: translateY(0);
+    }
+  }
+  .fade-in {
+    opacity: 0;
+    animation: fade-in 0.6s var(--ease-out-expo) forwards;
+  }
+  @keyframes fade-in {
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* ── Revelado al scroll. CSS puro, hilo del compositor.
+        Con fallback: sin soporte, el contenido se ve igual. ── */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .reveal {
+        animation: reveal-lift linear both;
+        animation-timeline: view();
+        animation-range: entry 2% cover 18%;
+      }
+      @keyframes reveal-lift {
+        from {
+          opacity: 0;
+          transform: translateY(18px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+    }
+  }
+
+  /* ── Prosa de artículo ──────────────────────────────────── */
+  .prose-manga {
+    font-size: 1.1875rem;
+    line-height: 1.75;
+    max-width: 68ch;
+  }
+  .prose-manga > * + * {
+    margin-top: 1.35rem;
+  }
+  .prose-manga h2 {
+    font-size: 1.875rem;
+    margin-top: 3rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 2px solid var(--color-ink);
+  }
+  .prose-manga h3 {
+    font-size: 1.375rem;
+    margin-top: 2.25rem;
+  }
+  .prose-manga a {
+    text-decoration: underline;
+    text-decoration-color: var(--color-red);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+  }
+  .prose-manga blockquote {
+    margin-inline: 0;
+    padding-left: 1.25rem;
+    border-left: 3px solid var(--color-red);
+    font-style: italic;
+  }
+  /* Resaltado de sintaxis dentro de la disciplina de cuatro colores:
+     monocromo, con el rojo del sello para las palabras clave. El código
+     se lee como código impreso, no como una captura del editor. */
+  .prose-manga pre {
+    --astro-code-foreground: var(--color-ink);
+    --astro-code-background: transparent;
+    --astro-code-token-comment: var(--color-slate);
+    --astro-code-token-keyword: var(--color-red);
+    --astro-code-token-string: var(--color-ink);
+    --astro-code-token-string-expression: var(--color-ink);
+    --astro-code-token-constant: var(--color-ink);
+    --astro-code-token-function: var(--color-ink);
+    --astro-code-token-parameter: var(--color-slate);
+    --astro-code-token-punctuation: var(--color-slate);
+    --astro-code-token-link: var(--color-red);
+    background-color: transparent !important;
+    color: var(--color-ink) !important;
+  }
+
+  .prose-manga pre {
+    border: 2px solid var(--color-ink);
+    padding: 1rem 1.15rem;
+    overflow-x: auto;
+    font-size: 0.8125rem;
+    line-height: 1.7;
+  }
+  .prose-manga :not(pre) > code {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    border: 1px solid var(--color-tone);
+    padding: 0.1em 0.35em;
+  }
+  .prose-manga ul,
+  .prose-manga ol {
+    padding-left: 1.35rem;
+  }
+  .prose-manga li + li {
+    margin-top: 0.45rem;
+  }
+  .prose-manga img {
+    border: 2px solid var(--color-ink);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   IMPRESIÓN — usado por /cv. Un reclutador que imprime tu CV no
+   debería recibir screentone ni tinta negra a sangre.
+   ═══════════════════════════════════════════════════════════════ */
+@media print {
+  .tone-overlay,
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+    color: #000;
+    font-size: 10.5pt;
+    line-height: 1.45;
+  }
+  a {
+    text-decoration: none;
+  }
+  /* La URL de los enlaces externos se imprime entre paréntesis:
+     en papel, un enlace sin destino visible es información perdida. */
+  a[href^='http']::after {
+    content: ' (' attr(href) ')';
+    font-size: 8pt;
+    color: #555;
+  }
+  .panel {
+    border-width: 1px;
+    break-inside: avoid;
+  }
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+  }
+  @page {
+    margin: 14mm;
+  }
+}

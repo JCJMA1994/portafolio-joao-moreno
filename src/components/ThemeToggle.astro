@@ -1,0 +1,45 @@
+---
+import { Sun, Moon } from 'lucide-react';
+// Los componentes React sin client:* se renderizan a HTML estático.
+// Estos iconos son SVG en el HTML final: cero JavaScript de lucide.
+---
+
+<button
+  id="theme-toggle"
+  type="button"
+  aria-label="Cambiar entre tema claro y oscuro"
+  class="ml-1.5 grid size-8 cursor-pointer place-items-center border-2 border-ink bg-transparent text-ink transition-colors hover:bg-ink hover:text-paper active:scale-90"
+>
+  <Sun size={14} strokeWidth={2} className="hidden dark:block" aria-hidden="true" />
+  <Moon size={14} strokeWidth={2} className="block dark:hidden" aria-hidden="true" />
+</button>
+
+<!-- Aviso de hot reload: el guiño que reconoce cualquiera que use Flutter -->
+<div
+  id="hot-reload"
+  role="status"
+  aria-live="polite"
+  class="pointer-events-none fixed bottom-4 left-1/2 z-70 -translate-x-1/2 translate-y-3 border-2 border-ink bg-ink px-3.5 py-2 font-mono text-[0.625rem] tracking-[0.05em] whitespace-nowrap text-paper opacity-0 transition-[opacity,transform] duration-300 ease-out-expo"
+>
+  ⚡ hot reload · <span id="hot-ms">312</span>ms
+</div>
+
+<script>
+  const root = document.documentElement;
+  const toast = document.getElementById('hot-reload');
+  const ms = document.getElementById('hot-ms');
+  let timer: ReturnType<typeof setTimeout>;
+
+  document.getElementById('theme-toggle')?.addEventListener('click', () => {
+    const dark = root.classList.toggle('dark');
+    root.style.colorScheme = dark ? 'dark' : 'light';
+    // Solo guardamos cuando el usuario elige. Si no hay valor,
+    // manda prefers-color-scheme del sistema.
+    localStorage.setItem('theme', dark ? 'dark' : 'light');
+
+    if (ms) ms.textContent = String(180 + Math.floor(Math.random() * 220));
+    toast?.classList.add('opacity-100', 'translate-y-0');
+    clearTimeout(timer);
+    timer = setTimeout(() => toast?.classList.remove('opacity-100', 'translate-y-0'), 1500);
+  });
+</script>

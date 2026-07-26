@@ -1,0 +1,27 @@
+---
+import { formatDate, isoDate } from '@/lib/utils';
+
+interface Props {
+  slug: string;
+  title: string;
+  description: string;
+  pubDate: Date;
+  minutes: number;
+  tags: string[];
+}
+const { slug, title, description, pubDate, minutes, tags } = Astro.props;
+---
+
+<li class="grid gap-1 border-b border-tone py-6">
+  <p class="m-0 font-mono text-xs tracking-[0.02em] text-slate">
+    <time datetime={isoDate(pubDate)}>{formatDate(pubDate)}</time>
+    · {minutes} min · {tags[0]}
+  </p>
+  <a
+    href={`/blog/${slug}`}
+    class="max-w-[30ch] font-impact text-[clamp(1.5rem,3.6vw,2.25rem)] leading-[0.98] font-extrabold uppercase no-underline transition-colors hover:text-red"
+  >
+    {title}
+  </a>
+  <p class="mt-1 mb-0 max-w-[54ch] text-[0.9375rem] text-slate">{description}</p>
+</li>

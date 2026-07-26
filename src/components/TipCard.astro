@@ -1,0 +1,27 @@
+---
+interface Props {
+  number: number;
+  title: string;
+  tag: string;
+  minutes: number;
+  href?: string;
+}
+const { number, title, tag, minutes, href } = Astro.props;
+const Tag = href ? 'a' : 'div';
+---
+
+<li
+  class="group flex flex-col gap-2 border-b border-tone p-4 transition-colors hover:bg-ink hover:text-paper sm:odd:border-r lg:border-r lg:border-b-0 lg:last:border-r-0"
+>
+  <Tag href={href} class="flex h-full flex-col gap-2 no-underline">
+    <span class="font-impact text-2xl leading-none font-black text-red">
+      {String(number).padStart(3, '0')}
+    </span>
+    <p class="m-0 font-read text-[0.9375rem] leading-[1.35] font-medium">{title}</p>
+    <p
+      class="mt-auto mb-0 flex justify-between gap-2 font-mono text-[0.5rem] tracking-[0.12em] text-slate uppercase group-hover:text-paper"
+    >
+      <span>{tag}</span><span>{minutes} min</span>
+    </p>
+  </Tag>
+</li>

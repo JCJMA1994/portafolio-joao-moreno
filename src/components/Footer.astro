@@ -1,0 +1,59 @@
+---
+import { profile } from '@/data/profile';
+
+const year = new Date().getFullYear();
+
+/**
+ * Compuesto en el frontmatter a propósito.
+ *
+ * Desde Astro 7 el valor por defecto de `compressHTML` es 'jsx', que
+ * elimina el espacio en blanco entre expresiones separadas por un salto
+ * de línea, igual que React. Si esto se escribe como
+ * `© {year} {profile.name}` en la plantilla, Prettier puede partir la
+ * línea al reformatear y el resultado sale «© 2026Jose Carlos».
+ *
+ * Construir la cadena aquí lo hace inmune al reformateo.
+ */
+const copyright = `© ${year} ${profile.name} · ${profile.city}, ${profile.country}`;
+---
+
+<footer
+  class="mx-auto grid max-w-[80rem] gap-4 border-t-2 border-ink px-[var(--pad)] py-8 lg:grid-cols-[1fr_auto] lg:items-end"
+>
+  <p class="m-0 font-mono text-[0.5625rem] leading-[1.9] tracking-[0.08em] text-slate">
+    <span data-testid="copyright">{copyright}</span><br />
+    Hecho con <a href="https://astro.build" class="border-b border-tone text-ink no-underline"
+      >Astro</a
+    >, desplegado en <a href="https://vercel.com" class="border-b border-tone text-ink no-underline"
+      >Vercel</a
+    >. Código en <a
+      href="https://github.com/JCJMA1994"
+      class="border-b border-tone text-ink no-underline">GitHub</a
+    >.<br />
+    Tipografías: Big Shoulders Display, Newsreader y Martian Mono.
+  </p>
+
+  <p class="m-0 font-mono text-[0.5625rem] tracking-[0.08em] text-slate">
+    <span data-testid="clock-label">Hora local{' '}</span><span
+      id="local-clock"
+      class="font-impact text-2xl font-extrabold tracking-[0.04em] text-ink tabular-nums">—:—</span
+    ><br />{profile.utcOffset}
+  </p>
+</footer>
+
+<script>
+  // Reloj de la zona horaria real: le dice a un reclutador extranjero en
+  // qué horario coincidís, sin que tenga que calcularlo.
+  const clock = document.getElementById('local-clock');
+  const tick = () => {
+    if (!clock) return;
+    clock.textContent = new Date().toLocaleTimeString('es-PE', {
+      timeZone: 'America/Lima',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+  };
+  tick();
+  setInterval(tick, 20_000);
+</script>

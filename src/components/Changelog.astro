@@ -1,0 +1,139 @@
+---
+import type { Entry } from '@/data/changelog';
+
+interface Props {
+  entries: Entry[];
+  /** Desactiva la animación escalonada del diff (para el <details>) */
+  static?: boolean;
+}
+const { entries, static: isStatic = false } = Astro.props;
+
+const VER_SIZE = {
+  major: 'text-xl text-red',
+  minor: 'text-sm',
+  patch: 'text-[0.6875rem] text-slate',
+} as const;
+
+const ROLE_SIZE = {
+  major: 'text-3xl font-black leading-[0.95]',
+  minor: 'text-xl font-extrabold',
+  patch: 'font-mono text-xs font-normal normal-case text-slate',
+} as const;
+---
+
+<ol class="m-0 list-none p-0">
+  {
+    entries.map((entry) => (
+      <li
+        class:list={[
+          'relative -mb-0.5 border-2 border-ink bg-paper',
+          entry.level === 'patch' ? 'px-6 py-3.5' : 'px-6 py-5',
+          entry.level === 'major' && 'screentone',
+        ]}
+      >
+        <div class="mb-2 flex flex-wrap items-baseline gap-x-4 gap-y-1.5">
+          <code class:list={['font-mono font-semibold', VER_SIZE[entry.level]]}>
+            [{entry.version}]
+          </code>
+          <span class="ml-auto font-mono text-[0.5625rem] tracking-[0.14em] text-slate uppercase">
+            {entry.date}
+          </span>
+        </div>
+
+        <p class:list={['m-0 block font-impact uppercase', ROLE_SIZE[entry.level]]}>{entry.role}</p>
+
+        {entry.org && (
+          <span class="mt-1 block font-mono text-[0.5625rem] tracking-[0.14em] text-slate uppercase">
+            {entry.org}
+          </span>
+        )}
+
+        {(entry.added || entry.removed) && (
+          <ul
+            class:list={[
+              'diff m-0 mt-4 list-none overflow-x-auto border border-tone bg-paper px-4 py-3.5 font-mono text-[0.625rem] leading-[1.95] p-0',
+              !isStatic && 'diff-animated',
+            ]}
+          >
+            {entry.added?.map((item) => (
+              <li class="add pr-4 whitespace-nowrap">{item}</li>
+            ))}
+            {entry.removed?.map((item) => (
+              <li class="rem pr-4 whitespace-nowrap">{item}</li>
+            ))}
+          </ul>
+        )}
+
+        {entry.chips && (
+          <ul class="m-0 mt-3.5 flex list-none flex-wrap gap-1.5 p-0">
+            {entry.chips.map((chip) => (
+              <li class="border border-ink px-1.5 py-1 font-mono text-[0.5rem] tracking-[0.1em] uppercase">
+                {chip}
+              </li>
+            ))}
+          </ul>
+        )}
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  /* Los signos van en CSS para que el texto copiado no los arrastre. */
+  .diff .add::before {
+    content: '+';
+    display: inline-block;
+    width: 1.3em;
+    font-weight: 700;
+    color: var(--color-ink);
+  }
+  .diff .rem {
+    color: var(--color-slate);
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+  }
+  .diff .rem::before {
+    content: '−';
+    display: inline-block;
+    width: 1.3em;
+    font-weight: 700;
+    color: var(--color-red);
+    text-decoration: none;
+  }
+
+  /* El diff se escribe línea a línea al hacer scroll. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .diff-animated li {
+        animation: diff-slide linear both;
+        animation-timeline: view();
+        animation-range: entry 10% cover 28%;
+      }
+      .diff-animated li:nth-child(2) {
+        animation-range: entry 13% cover 31%;
+      }
+      .diff-animated li:nth-child(3) {
+        animation-range: entry 16% cover 34%;
+      }
+      .diff-animated li:nth-child(4) {
+        animation-range: entry 19% cover 37%;
+      }
+      .diff-animated li:nth-child(5) {
+        animation-range: entry 22% cover 40%;
+      }
+      .diff-animated li:nth-child(6) {
+        animation-range: entry 25% cover 43%;
+      }
+      @keyframes diff-slide {
+        from {
+          opacity: 0;
+          transform: translateX(-12px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+    }
+  }
+</style>

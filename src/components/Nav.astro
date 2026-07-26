@@ -1,0 +1,70 @@
+---
+import ThemeToggle from './ThemeToggle.astro';
+import { profile } from '@/data/profile';
+
+const links = [
+  { href: '/#trayecto', label: 'Trayecto' },
+  { href: '/blog', label: 'Blog' },
+  { href: '/tips', label: 'Apuntes' },
+  { href: '/cv', label: 'CV' },
+  { href: '/links', label: 'Enlaces' },
+  { href: '/#contacto', label: 'Contacto' },
+];
+const path = Astro.url.pathname;
+---
+
+<div class="progress-bar" aria-hidden="true"></div>
+
+<nav class="sticky top-0 z-50 border-b-2 border-ink bg-paper">
+  <div class="mx-auto flex h-14 max-w-[80rem] items-center justify-between gap-4 px-[var(--pad)]">
+    <a
+      href="/"
+      class="font-impact text-lg font-black tracking-[0.02em] whitespace-nowrap uppercase no-underline"
+    >
+      {profile.secondLine}
+    </a>
+
+    <div class="flex items-center gap-0.5">
+      {
+        links.map((link) => (
+          <a
+            href={link.href}
+            aria-current={path === link.href ? 'page' : undefined}
+            class:list={[
+              'hidden px-2.5 py-1.5 font-mono text-[0.625rem] font-medium tracking-[0.1em] text-slate uppercase no-underline transition-colors hover:bg-ink hover:text-paper sm:block',
+              path === link.href && 'bg-ink text-paper',
+            ]}
+          >
+            {link.label}
+          </a>
+        ))
+      }
+      <ThemeToggle />
+    </div>
+  </div>
+</nav>
+
+<style>
+  /* Barra de progreso de lectura con scroll-timeline: cero JavaScript. */
+  .progress-bar {
+    position: fixed;
+    inset-inline: 0;
+    top: 0;
+    z-index: 60;
+    height: 3px;
+    background: var(--color-red);
+    transform-origin: 0 50%;
+    transform: scaleX(0);
+  }
+  @supports (animation-timeline: scroll()) {
+    .progress-bar {
+      animation: progress-grow linear both;
+      animation-timeline: scroll(root block);
+    }
+    @keyframes progress-grow {
+      to {
+        transform: scaleX(1);
+      }
+    }
+  }
+</style>

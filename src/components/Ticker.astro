@@ -1,0 +1,45 @@
+---
+interface Props {
+  items: string[];
+}
+const { items } = Astro.props;
+// Duplicamos la lista para que el bucle no tenga costura visible.
+const doubled = [...items, ...items];
+---
+
+<div class="overflow-hidden border-y-2 border-ink bg-ink py-2 text-paper" aria-hidden="true">
+  <div class="ticker-track flex w-max gap-10">
+    {
+      [0, 1].map(() => (
+        <div class="flex shrink-0 items-center gap-10">
+          {doubled.map((item) => (
+            <span class="flex items-center gap-10 font-impact text-base font-bold tracking-[0.1em] whitespace-nowrap uppercase">
+              {item}
+              <span class="text-red">✦</span>
+            </span>
+          ))}
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .ticker-track {
+    animation: ticker-slide 40s linear infinite;
+  }
+  /* Se pausa al pasar el cursor: si alguien quiere leerlo, puede. */
+  .ticker-track:hover {
+    animation-play-state: paused;
+  }
+  @keyframes ticker-slide {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ticker-track {
+      animation: none;
+    }
+  }
+</style>
