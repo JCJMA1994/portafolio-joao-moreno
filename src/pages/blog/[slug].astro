@@ -5,6 +5,8 @@ import Nav from '@/components/Nav.astro';
 import Footer from '@/components/Footer.astro';
 import { formatDate, isoDate, readingTime } from '@/lib/utils';
 import { profile } from '@/data/profile';
+import { getSeriesNav } from '@/lib/series';
+import LevelBadge from '@/components/LevelBadge.astro';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ data }) => !data.draft);
@@ -16,11 +18,17 @@ const { Content } = await render(post);
 const minutes = readingTime(post.body ?? '');
 const origin = Astro.site?.origin ?? '';
 
-// Artículos relacionados por etiqueta compartida.
 const all = await getCollection('blog', ({ data }) => !data.draft);
-const related = all
-  .filter((p) => p.id !== post.id && p.data.tags.some((t) => post.data.tags.includes(t)))
-  .slice(0, 2);
+const seriesNav = getSeriesNav(all, post.id);
+
+// Artículos relacionados por etiqueta compartida. Solo se muestran
+// cuando el post NO pertenece a una serie: la navegación de serie
+// reemplaza al bloque de relacionados, nunca conviven ambos.
+const related = seriesNav
+  ? []
+  : all
+      .filter((p) => p.id !== post.id && p.data.tags.some((t) => post.data.tags.includes(t)))
+      .slice(0, 2);
 ---
 
 <Base
@@ -68,6 +76,9 @@ const related = all
 
     <article>
       <header class="mb-10 border-b-2 border-ink pb-6">
+        <div class="mb-4">
+          <LevelBadge level={post.data.level} />
+        </div>
         <h1 class="max-w-[26ch] text-[clamp(2rem,7vw,4.5rem)] leading-[0.9] font-black">
           {post.data.title}
         </h1>
@@ -90,7 +101,50 @@ const related = all
     </article>
 
     {
-      related.length > 0 && (
+      seriesNav && (
+        <aside class="mt-20 border-t-2 border-ink pt-8">
+          <h2 class="mb-6 text-base tracking-[0.1em]">
+            <a href={`/blog/series/${seriesNav.slug}`} class="no-underline hover:text-red">
+              {seriesNav.name}
+            </a>
+            <span class="ml-2 font-mono text-xs tracking-[0.08em] text-slate normal-case">
+              Parte {seriesNav.index} de {seriesNav.total}
+            </span>
+          </h2>
+          <ul class="m-0 grid list-none gap-0 border-2 border-ink p-0 sm:grid-cols-2">
+            {seriesNav.prev && (
+              <li class="border-b-2 border-ink p-5 transition-colors hover:screentone sm:border-r-2 sm:border-b-0">
+                <span class="mb-1 block font-mono text-[0.5625rem] tracking-[0.1em] text-slate uppercase">
+                  ← Anterior
+                </span>
+                <a
+                  href={`/blog/${seriesNav.prev.id}`}
+                  class="font-impact text-xl leading-none font-extrabold uppercase no-underline"
+                >
+                  {seriesNav.prev.data.title}
+                </a>
+              </li>
+            )}
+            {seriesNav.next && (
+              <li class="p-5 transition-colors hover:screentone">
+                <span class="mb-1 block font-mono text-[0.5625rem] tracking-[0.1em] text-slate uppercase">
+                  Siguiente →
+                </span>
+                <a
+                  href={`/blog/${seriesNav.next.id}`}
+                  class="font-impact text-xl leading-none font-extrabold uppercase no-underline"
+                >
+                  {seriesNav.next.data.title}
+                </a>
+              </li>
+            )}
+          </ul>
+        </aside>
+      )
+    }
+
+    {
+      !seriesNav && related.length > 0 && (
         <aside class="mt-20 border-t-2 border-ink pt-8">
           <h2 class="mb-6 text-base tracking-[0.1em]">Sigue leyendo</h2>
           <ul class="m-0 grid list-none gap-0 border-2 border-ink p-0 sm:grid-cols-2">
