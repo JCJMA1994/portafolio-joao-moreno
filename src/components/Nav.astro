@@ -3,36 +3,45 @@ import ThemeToggle from './ThemeToggle.astro';
 import { profile } from '@/data/profile';
 
 const links = [
-  { href: '/#trayecto', label: 'Trayecto' },
   { href: '/blog', label: 'Blog' },
-  { href: '/tips', label: 'Apuntes' },
+  { href: '/#trabajo', label: 'Trabajo' },
   { href: '/cv', label: 'CV' },
-  { href: '/links', label: 'Enlaces' },
   { href: '/#contacto', label: 'Contacto' },
 ];
 const path = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === '/blog' ? path === '/blog' || path.startsWith('/blog/') : path === href;
 ---
 
 <div class="progress-bar" aria-hidden="true"></div>
 
-<nav class="sticky top-0 z-50 border-b-2 border-ink bg-paper">
-  <div class="mx-auto flex h-14 max-w-[80rem] items-center justify-between gap-4 px-[var(--pad)]">
+<nav
+  class="field-nav-shell sticky top-0 z-50 border-b border-ink bg-paper"
+  aria-label="Navegación principal"
+>
+  <div class="field-nav-inner mx-auto max-w-[80rem] px-[var(--pad)]">
     <a
       href="/"
-      class="font-impact text-lg font-black tracking-[0.02em] whitespace-nowrap uppercase no-underline"
+      class="field-brand font-mono text-xs font-semibold tracking-[0.08em] whitespace-nowrap uppercase no-underline"
     >
-      {profile.secondLine}
+      {profile.initials} / Field Notes
     </a>
 
-    <div class="flex items-center gap-0.5">
+    <p class="field-status m-0 font-mono text-[0.625rem] text-slate">
+      <span class="field-signal" aria-hidden="true"></span>
+      {profile.available ? 'Disponible' : 'No disponible'} · {profile.city} · {profile.utcOffset}
+    </p>
+
+    <div class="field-nav-links flex items-center gap-0.5">
       {
         links.map((link) => (
           <a
             href={link.href}
-            aria-current={path === link.href ? 'page' : undefined}
+            data-nav-link
+            aria-current={isActive(link.href) ? 'page' : undefined}
             class:list={[
-              'hidden px-2.5 py-1.5 font-mono text-[0.625rem] font-medium tracking-[0.1em] text-slate uppercase no-underline transition-colors hover:bg-ink hover:text-paper sm:block',
-              path === link.href && 'bg-ink text-paper',
+              'px-2 py-1.5 font-mono text-[0.625rem] font-medium tracking-[0.06em] text-slate uppercase no-underline transition-colors hover:bg-ink hover:text-paper',
+              isActive(link.href) && 'bg-ink text-paper',
             ]}
           >
             {link.label}
@@ -44,6 +53,23 @@ const path = Astro.url.pathname;
   </div>
 </nav>
 
+<script>
+  const syncHashNavigation = () => {
+    if (location.pathname !== '/') return;
+    const currentHref = location.hash ? `/${location.hash}` : '';
+    document.querySelectorAll<HTMLAnchorElement>('[data-nav-link]').forEach((link) => {
+      const active = link.getAttribute('href') === currentHref;
+      if (active) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+      link.classList.toggle('bg-ink', active);
+      link.classList.toggle('text-paper', active);
+    });
+  };
+
+  syncHashNavigation();
+  window.addEventListener('hashchange', syncHashNavigation);
+</script>
+
 <style>
   /* Barra de progreso de lectura con scroll-timeline: cero JavaScript. */
   .progress-bar {
@@ -52,7 +78,7 @@ const path = Astro.url.pathname;
     top: 0;
     z-index: 60;
     height: 3px;
-    background: var(--color-red);
+    background: var(--color-signal);
     transform-origin: 0 50%;
     transform: scaleX(0);
   }
@@ -65,6 +91,49 @@ const path = Astro.url.pathname;
       to {
         transform: scaleX(1);
       }
+    }
+  }
+  .field-nav-inner {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 1rem;
+    min-height: 4rem;
+    padding-block: 0.65rem;
+  }
+  .field-status {
+    justify-self: center;
+  }
+  .field-signal {
+    display: inline-block;
+    width: 0.65rem;
+    height: 0.65rem;
+    margin-right: 0.35rem;
+    border: 1px solid var(--color-ink);
+    background: var(--color-signal);
+    vertical-align: -0.05rem;
+  }
+  @media (max-width: 48rem) {
+    .field-nav-inner {
+      grid-template-columns: 1fr auto;
+      gap: 0.5rem;
+    }
+    .field-status {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      justify-self: start;
+    }
+    .field-nav-links {
+      grid-column: 1 / -1;
+      grid-row: 3;
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+  @media (max-width: 22rem) {
+    .field-nav-links a {
+      padding-inline: 0.35rem;
+      letter-spacing: 0.02em;
     }
   }
 </style>

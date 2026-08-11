@@ -4,6 +4,8 @@ description: 'La cola de escrituras pendientes es la parte que nadie explica en 
 pubDate: 2026-07-14
 tags: ['arquitectura', 'sqlite', 'flutter']
 level: 'intermedio'
+number: 38
+featured: false
 series:
   name: 'Offline-first'
   order: 1

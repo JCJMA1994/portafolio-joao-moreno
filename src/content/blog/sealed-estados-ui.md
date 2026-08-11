@@ -4,6 +4,8 @@ description: 'Modelar loading, error y datos con clases sealed y switch exhausti
 pubDate: 2026-07-15
 tags: ['dart', 'dart-3', 'flutter', 'estado']
 level: 'intermedio'
+number: 39
+featured: false
 ---
 
 El bug clásico de una pantalla con estados: agregas un estado nuevo —digamos

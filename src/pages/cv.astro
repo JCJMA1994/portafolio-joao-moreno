@@ -1,143 +1,386 @@
 ---
 import Base from '@/layouts/Base.astro';
-import {
-  profile,
-  skillGroups,
-  education,
-  certifications,
-  languages,
-  socials,
-} from '@/data/profile';
-import { changelog } from '@/data/changelog';
+import { cv } from '@/data/cv';
 
-/**
- * Versión sobria e imprimible. Sin screentone, sin animaciones, sin
- * simulador: es el documento que un reclutador de banca o consultora
- * imprime o adjunta a una candidatura. noindex para que no compita
- * con la home en resultados de búsqueda.
- */
-const experience = changelog.filter(
-  (e) =>
-    e.org &&
-    !e.org.includes('certificación') &&
-    !e.org.includes('Microsoft') &&
-    !e.org.includes('Universidad'),
-);
+const shortUrl = (url: string) => url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
 ---
 
-<Base title={`CV · ${profile.name}`} description={profile.seoDescription} path="/cv" noindex plain>
-  <main id="main" class="mx-auto max-w-[52rem] px-[var(--pad)] py-12 print:py-0">
-    <div class="no-print mb-10 flex flex-wrap gap-2.5">
-      <a href="/" class="btn btn-ghost">← Volver</a>
-      <button type="button" class="btn btn-solid" id="print-cv">Imprimir o guardar en PDF</button>
-    </div>
+<Base title={`CV · ${cv.name}`} description={cv.summary} path="/cv" noindex>
+  <div class="no-print cv-actions mx-auto flex max-w-[68rem] flex-wrap gap-3 px-[var(--pad)] pt-5">
+    <a href="/" class="btn btn-ghost">← Volver</a>
+    <button type="button" class="btn btn-solid" id="print-cv">Imprimir o guardar en PDF</button>
+  </div>
 
-    <header class="border-b-2 border-ink pb-5">
-      <h1 class="text-[clamp(1.75rem,6vw,3rem)] leading-[0.95] font-black">{profile.name}</h1>
-      <p class="mt-2 mb-3 font-mono text-[0.6875rem] tracking-[0.14em] uppercase">{profile.role}</p>
-      <p class="m-0 font-mono text-[0.6875rem] text-slate">
-        {profile.city}, {profile.region}, {profile.country} ·
-        <a href={`tel:${profile.phone}`}>{profile.phoneDisplay}</a> ·
-        <a href={`mailto:${profile.email}`}>{profile.email}</a><br />
-        {
-          socials.map((s) => (
-            <a href={s.url} class="mr-3">
-              {s.label}
-            </a>
-          ))
-        }
-      </p>
+  <main id="main" class="dossier-page">
+    <header class="dossier-header">
+      <div>
+        <p class="dossier-code">Engineering dossier · JM-2026</p>
+        <h1>{cv.name}</h1>
+        <p class="dossier-role">{cv.role}</p>
+      </div>
+      <address class="dossier-contact">
+        <ul>
+          <li>{cv.location}</li>
+          <li><a href={`mailto:${cv.email}`}>{cv.email}</a></li>
+          <li><a href={`tel:${cv.phone}`}>{cv.phoneDisplay}</a></li>
+          <li><a href={cv.linkedin}>{shortUrl(cv.linkedin)}</a></li>
+          <li><a href={cv.github}>{shortUrl(cv.github)}</a></li>
+        </ul>
+      </address>
     </header>
 
-    <section class="mt-8">
-      <h2 class="mb-3 border-b border-tone pb-1 text-base tracking-[0.1em]">Perfil profesional</h2>
-      <p class="m-0 text-[0.9375rem]">{profile.seoDescription}</p>
-    </section>
-
-    <section class="mt-8">
-      <h2 class="mb-4 border-b border-tone pb-1 text-base tracking-[0.1em]">Experiencia laboral</h2>
+    <section class="metrics" aria-label="Resultados destacados">
       {
-        experience.map((job) => (
-          <div class="mb-6 break-inside-avoid">
-            <div class="flex flex-wrap items-baseline justify-between gap-2">
-              <h3 class="text-base">
-                {job.role} — {job.org}
-              </h3>
-              <span class="font-mono text-[0.625rem] tracking-[0.1em] text-slate uppercase">
-                {job.date}
-              </span>
-            </div>
-            {job.added && (
-              <ul class="mt-2 mb-0 list-disc pl-5 text-[0.9375rem]">
-                {job.added.map((item) => (
-                  <li class="mb-1">{item}</li>
-                ))}
-              </ul>
-            )}
+        cv.metrics.map((metric) => (
+          <div class="metric" data-cv-metric>
+            <>
+              <strong>{metric.value}</strong>
+              <span>{metric.label}</span>
+            </>
           </div>
         ))
       }
     </section>
 
-    <section class="mt-8 break-inside-avoid">
-      <h2 class="mb-3 border-b border-tone pb-1 text-base tracking-[0.1em]">
-        Habilidades técnicas
-      </h2>
-      <dl class="m-0 grid gap-2 text-[0.9375rem]">
-        {
-          skillGroups.map((group) => (
-            <div class="grid gap-1 sm:grid-cols-[9rem_1fr] sm:gap-4">
-              <dt class="font-mono text-[0.6875rem] tracking-[0.08em] uppercase">{group.group}</dt>
-              <dd class="m-0">{group.items}</dd>
-            </div>
-          ))
-        }
-      </dl>
+    <section class="dossier-summary" aria-labelledby="summary-heading">
+      <h2 id="summary-heading" class="section-label">Perfil / 01</h2>
+      <p>{cv.summary}</p>
     </section>
 
-    <section class="mt-8 break-inside-avoid">
-      <h2 class="mb-3 border-b border-tone pb-1 text-base tracking-[0.1em]">Educación</h2>
-      {
-        education.map((item) => (
-          <div class="flex flex-wrap items-baseline justify-between gap-2">
-            <p class="m-0 text-[0.9375rem]">
-              <strong>{item.title}</strong> — {item.org}
-            </p>
-            <span class="font-mono text-[0.625rem] tracking-[0.1em] text-slate uppercase">
-              {item.date}
-            </span>
+    <div class="dossier-columns">
+      <section aria-labelledby="experience-heading">
+        <div class="section-heading">
+          <span class="section-label">02</span><h2 id="experience-heading">
+            Experiencia seleccionada
+          </h2>
+        </div>
+        {
+          cv.experience.map((job) => (
+            <article class="job">
+              <p class="job-period">{job.period}</p>
+              <div>
+                <h3>
+                  {job.role} · {job.company}
+                </h3>
+                <p class="job-company">{job.context}</p>
+                <ul>
+                  {job.achievements.map((achievement) => (
+                    <li>{achievement}</li>
+                  ))}
+                </ul>
+              </div>
+            </article>
+          ))
+        }
+      </section>
+
+      <aside class="dossier-side" aria-label="Competencias y formación">
+        <section aria-labelledby="stack-heading">
+          <div class="section-heading">
+            <span class="section-label">03</span><h2 id="stack-heading">Stack</h2>
           </div>
-        ))
-      }
-    </section>
+          <ul class="stack-list">
+            {
+              cv.stack.map((group) => (
+                <li>
+                  <strong>{group.label}</strong>
+                  <span>{group.items}</span>
+                </li>
+              ))
+            }
+          </ul>
+        </section>
 
-    <section class="mt-8 break-inside-avoid">
-      <h2 class="mb-3 border-b border-tone pb-1 text-base tracking-[0.1em]">Certificaciones</h2>
-      <ul class="m-0 list-none p-0 text-[0.9375rem]">
-        {
-          certifications.map((cert) => (
-            <li class="mb-2 flex flex-wrap items-baseline justify-between gap-2">
-              <span>
-                {cert.title} — {cert.org}
-              </span>
-              <span class="font-mono text-[0.625rem] tracking-[0.1em] text-slate uppercase">
-                {cert.date}
-              </span>
-            </li>
-          ))
-        }
-      </ul>
-    </section>
+        <section aria-labelledby="education-heading">
+          <div class="section-heading">
+            <span class="section-label">04</span><h2 id="education-heading">Formación</h2>
+          </div>
+          <ul class="education-list">
+            {
+              cv.education.map((item) => (
+                <li>
+                  {item.title}
+                  <span>{item.detail}</span>
+                </li>
+              ))
+            }
+          </ul>
+        </section>
 
-    <section class="mt-8 break-inside-avoid">
-      <h2 class="mb-3 border-b border-tone pb-1 text-base tracking-[0.1em]">Idiomas</h2>
-      <p class="m-0 text-[0.9375rem]">
-        {languages.map((lang) => `${lang.name} (${lang.level})`).join(' · ')}
-      </p>
-    </section>
+        <section class="availability" aria-label="Disponibilidad">
+          <strong>{cv.availability.label}</strong>
+          {cv.availability.detail}
+        </section>
+      </aside>
+    </div>
+
+    <footer class="dossier-footer">
+      <span>Currículum dirigido · Flutter Engineering</span><span>Actualizado 2026</span>
+    </footer>
   </main>
 </Base>
 
 <script>
   document.getElementById('print-cv')?.addEventListener('click', () => window.print());
 </script>
+
+<style>
+  .dossier-page {
+    max-width: 68rem;
+    margin: 0 auto;
+    padding: 1.5rem var(--pad);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    line-height: 1.45;
+  }
+  .dossier-page * {
+    box-sizing: border-box;
+  }
+  .dossier-page a {
+    overflow-wrap: anywhere;
+    text-underline-offset: 0.25rem;
+  }
+  .dossier-page p,
+  .dossier-page h1,
+  .dossier-page h2,
+  .dossier-page h3 {
+    margin-top: 0;
+  }
+  .dossier-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(14rem, 0.55fr);
+    gap: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 4px solid var(--color-ink);
+  }
+  .dossier-code,
+  .section-label {
+    color: var(--color-slate);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  h1,
+  .dossier-role {
+    font-family: var(--font-impact);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+  h1 {
+    margin-bottom: 0.2rem;
+    font-size: clamp(2.7rem, 7vw, 5.2rem);
+    line-height: 0.9;
+  }
+  .dossier-role {
+    margin-bottom: 0;
+    font-size: clamp(1.35rem, 3vw, 1.9rem);
+  }
+  .dossier-contact {
+    align-self: end;
+    border-left: 0.65rem solid var(--color-signal);
+    padding-left: 1rem;
+    font-style: normal;
+    overflow-wrap: anywhere;
+  }
+  .dossier-contact ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .dossier-contact li {
+    margin-top: 0.3rem;
+  }
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-bottom: 1px solid var(--color-ink);
+  }
+  .metric {
+    padding: 0.8rem 1rem;
+    border-right: 1px solid var(--color-ink);
+  }
+  .metric:last-child {
+    border-right: 0;
+  }
+  .metric strong {
+    display: block;
+    font-family: var(--font-impact);
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 400;
+    line-height: 1;
+  }
+  .metric span {
+    color: var(--color-slate);
+  }
+  .dossier-summary {
+    display: grid;
+    grid-template-columns: 8rem minmax(0, 1fr);
+    gap: 1rem;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid var(--color-ink);
+  }
+  .dossier-summary p {
+    max-width: 78ch;
+    margin-bottom: 0;
+  }
+  .dossier-columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1.75fr) minmax(14rem, 0.7fr);
+    gap: 1.5rem;
+    padding-top: 0.9rem;
+  }
+  .section-heading {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid var(--color-ink);
+  }
+  .section-heading h2 {
+    margin-bottom: 0;
+    font-family: var(--font-impact);
+    font-size: 1.65rem;
+    font-weight: 400;
+  }
+  .job {
+    display: grid;
+    grid-template-columns: 6.8rem minmax(0, 1fr);
+    gap: 0.75rem;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid var(--color-tone);
+    break-inside: avoid;
+  }
+  .job-period,
+  .job-company {
+    color: var(--color-slate);
+  }
+  .job h3 {
+    margin-bottom: 0.12rem;
+    font: 500 0.78rem var(--font-mono);
+  }
+  .job-company {
+    margin-bottom: 0;
+  }
+  .job ul {
+    margin: 0.35rem 0 0;
+    padding-left: 1rem;
+  }
+  .job li {
+    margin-bottom: 0.2rem;
+  }
+  .dossier-side section {
+    margin-bottom: 0.9rem;
+    break-inside: avoid;
+  }
+  .stack-list,
+  .education-list {
+    list-style: none;
+    margin: 0.45rem 0 0;
+    padding: 0;
+  }
+  .stack-list li {
+    padding: 0.3rem 0;
+    border-bottom: 1px solid var(--color-tone);
+  }
+  .stack-list strong {
+    display: block;
+    font-weight: 500;
+  }
+  .stack-list span {
+    display: block;
+    color: var(--color-slate);
+  }
+  .education-list li {
+    padding: 0.35rem 0;
+  }
+  .education-list span {
+    display: block;
+    color: var(--color-slate);
+  }
+  .availability {
+    padding: 0.7rem;
+    border: 1px solid var(--color-ink);
+    border-left: 0.65rem solid var(--color-signal);
+  }
+  .availability strong {
+    display: block;
+    margin-bottom: 0.2rem;
+    font-weight: 500;
+  }
+  .dossier-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-top: 0.8rem;
+    padding-top: 0.5rem;
+    border-top: 4px solid var(--color-ink);
+    color: var(--color-slate);
+  }
+  @media (max-width: 48rem) {
+    .dossier-header,
+    .dossier-columns {
+      grid-template-columns: 1fr;
+    }
+    .dossier-summary {
+      grid-template-columns: 1fr;
+      gap: 0.3rem;
+    }
+    .dossier-contact {
+      align-self: auto;
+    }
+  }
+  @media (max-width: 34rem) {
+    .dossier-page {
+      padding: 1rem;
+    }
+    .metrics {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .metric {
+      min-width: 0;
+      padding: 0.65rem 0.35rem;
+      overflow-wrap: anywhere;
+    }
+    .metric strong {
+      font-size: clamp(1.45rem, 8vw, 2rem);
+    }
+    .metric span {
+      font-size: 0.62rem;
+      line-height: 1.2;
+    }
+    .job {
+      grid-template-columns: 1fr;
+      gap: 0.2rem;
+    }
+  }
+  @media print {
+    .dossier-page {
+      width: 182mm;
+      max-width: none;
+      padding: 0;
+      font-size: 7.25pt;
+      line-height: 1.35;
+    }
+    h1 {
+      font-size: 35pt;
+    }
+    .dossier-role {
+      font-size: 15pt;
+    }
+    .metric strong {
+      font-size: 22pt;
+    }
+    .section-heading h2 {
+      font-size: 13.5pt;
+    }
+    .dossier-header {
+      gap: 8mm;
+    }
+    .dossier-columns {
+      gap: 6mm;
+    }
+    .dossier-page a[href^='http']::after {
+      content: none;
+    }
+  }
+</style>

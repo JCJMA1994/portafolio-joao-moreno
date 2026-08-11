@@ -2,36 +2,38 @@
 
 /* ═══════════════════════════════════════════════════════════════
    TOKENS — disciplina de manga impreso.
-   Cuatro colores: tinta, papel, gris de trama y rojo de sello.
+   Cuatro colores: tinta, papel, gris de trama y verde señal.
    El ESTADO se comunica con textura (screentone), no añadiendo
    colores. Si te ves necesitando un quinto color, casi siempre
    la respuesta correcta es una trama.
    ═══════════════════════════════════════════════════════════════ */
 @theme {
-  --color-ink: #0d0e11;
-  --color-paper: #f7f5ef;
-  --color-tone: #c4c2ba;
-  --color-red: #c1272d;
-  --color-slate: #6b6b66;
+  --color-ink: #141610;
+  --color-paper: #f3f0e7;
+  --color-tone: #c4c7ba;
+  --color-signal: #a6d900;
+  --color-red: #618000;
+  --color-slate: #5e6256;
 
-  --font-impact: 'Big Shoulders Display', Impact, sans-serif;
-  --font-read: 'Newsreader', Georgia, serif;
-  --font-mono: 'Martian Mono', ui-monospace, monospace;
-  --font-jp: 'Noto Sans JP', sans-serif;
+  --font-impact: 'Instrument Serif', Georgia, serif;
+  --font-read: 'IBM Plex Mono', ui-monospace, monospace;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --font-jp: 'IBM Plex Mono', ui-monospace, monospace;
 
   --ease-out-expo: cubic-bezier(0.2, 1, 0.3, 1);
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* En oscuro no invertimos mecánicamente: el rojo se aclara para
+/* En oscuro no invertimos mecánicamente: el verde señal se aclara para
    mantener contraste AA sobre fondo oscuro. */
 .dark {
-  --color-ink: #f2f0ea;
-  --color-paper: #101114;
-  --color-tone: #3a3b40;
-  --color-red: #e2565c;
-  --color-slate: #9a9a94;
+  --color-ink: #f3f0e7;
+  --color-paper: #151712;
+  --color-tone: #44483c;
+  --color-signal: #c7ff35;
+  --color-red: #c7ff35;
+  --color-slate: #adb2a1;
 }
 
 @layer base {
@@ -82,9 +84,8 @@
   h4 {
     margin: 0;
     font-family: var(--font-impact);
-    font-weight: 800;
-    line-height: 0.95;
-    text-transform: uppercase;
+    font-weight: 400;
+    line-height: 1;
   }
 
   a {
@@ -97,13 +98,13 @@
   button:focus-visible,
   input:focus-visible,
   summary:focus-visible {
-    outline: 3px solid var(--color-red);
+    outline: 3px solid var(--color-signal);
     outline-offset: 2px;
   }
 
   ::selection {
-    background: var(--color-red);
-    color: var(--color-paper);
+    background: var(--color-signal);
+    color: #141610;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -130,19 +131,6 @@
     background-image: radial-gradient(var(--color-tone) 0.9px, transparent 1px);
     background-size: 4px 4px;
   }
-  .tone-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
-    opacity: 0.5;
-    background-image: radial-gradient(var(--color-tone) 0.9px, transparent 1px);
-    background-size: 5px 5px;
-  }
-  .dark .tone-overlay {
-    opacity: 0.35;
-  }
-
   /* ── Panel: borde grueso, esquinas rectas, sin sombra difusa.
         Es tinta sobre papel, no una tarjeta con elevación. ──── */
   .panel {
@@ -172,11 +160,11 @@
   .btn-solid {
     background: var(--color-ink);
     color: var(--color-paper);
-    box-shadow: 4px 4px 0 0 var(--color-red);
+    box-shadow: 4px 4px 0 0 var(--color-signal);
   }
   .btn-solid:hover {
     transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0 0 var(--color-red);
+    box-shadow: 6px 6px 0 0 var(--color-signal);
   }
   .btn-ghost {
     background: var(--color-paper);
@@ -188,7 +176,7 @@
     box-shadow: 6px 6px 0 0 var(--color-tone);
   }
 
-  /* ── Rotulador. Aparece dos veces por página, no más. ───── */
+  /* ── Rotulador en verde señal. Aparece dos veces por página, no más. ───── */
   .marker {
     background-image: linear-gradient(
       to right,
@@ -294,15 +282,15 @@
 
   /* ── Prosa de artículo ──────────────────────────────────── */
   .prose-manga {
-    font-size: 1.1875rem;
+    font-size: 1rem;
     line-height: 1.75;
-    max-width: 68ch;
+    max-width: 69ch;
   }
   .prose-manga > * + * {
     margin-top: 1.35rem;
   }
   .prose-manga h2 {
-    font-size: 1.875rem;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
     margin-top: 3rem;
     padding-bottom: 0.4rem;
     border-bottom: 2px solid var(--color-ink);
@@ -313,37 +301,38 @@
   }
   .prose-manga a {
     text-decoration: underline;
-    text-decoration-color: var(--color-red);
+    text-decoration-color: var(--color-signal);
     text-decoration-thickness: 2px;
     text-underline-offset: 3px;
   }
   .prose-manga blockquote {
     margin-inline: 0;
-    padding-left: 1.25rem;
-    border-left: 3px solid var(--color-red);
-    font-style: italic;
+    border: 1px solid var(--color-ink);
+    border-left: 0.65rem solid var(--color-signal);
+    padding: 1rem 1rem 1rem 1.25rem;
   }
   /* Resaltado de sintaxis dentro de la disciplina de cuatro colores:
-     monocromo, con el rojo del sello para las palabras clave. El código
+     monocromo, con verde señal para las palabras clave. El código
      se lee como código impreso, no como una captura del editor. */
   .prose-manga pre {
     --astro-code-foreground: var(--color-ink);
     --astro-code-background: transparent;
     --astro-code-token-comment: var(--color-slate);
-    --astro-code-token-keyword: var(--color-red);
+    --astro-code-token-keyword: var(--color-signal);
     --astro-code-token-string: var(--color-ink);
     --astro-code-token-string-expression: var(--color-ink);
     --astro-code-token-constant: var(--color-ink);
     --astro-code-token-function: var(--color-ink);
     --astro-code-token-parameter: var(--color-slate);
     --astro-code-token-punctuation: var(--color-slate);
-    --astro-code-token-link: var(--color-red);
-    background-color: transparent !important;
-    color: var(--color-ink) !important;
+    --astro-code-token-link: var(--color-signal);
+    background-color: #20231b !important;
+    color: #f3f0e7 !important;
   }
 
   .prose-manga pre {
-    border: 2px solid var(--color-ink);
+    border: 0;
+    border-left: 0.65rem solid var(--color-signal);
     padding: 1rem 1.15rem;
     overflow-x: auto;
     font-size: 0.8125rem;
@@ -372,7 +361,6 @@
    debería recibir screentone ni tinta negra a sangre.
    ═══════════════════════════════════════════════════════════════ */
 @media print {
-  .tone-overlay,
   .no-print {
     display: none !important;
   }

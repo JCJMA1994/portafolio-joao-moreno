@@ -4,6 +4,8 @@ description: 'El patrón outbox aplicado a Flutter con SQLite: encolar la mutaci
 pubDate: 2026-07-22
 tags: ['flutter', 'sqlite', 'offline', 'arquitectura']
 level: 'avanzado'
+number: 40
+featured: true
 series:
   name: 'Offline-first'
   order: 2

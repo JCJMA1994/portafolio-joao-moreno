@@ -4,6 +4,8 @@ description: 'Firebase Remote Config sirve para apagar una feature rota en produ
 pubDate: 2026-07-25
 tags: ['flutter', 'firebase', 'remote-config']
 level: 'intermedio'
+number: 42
+featured: false
 ---
 
 Casi todo el mundo conoce Remote Config para experimentos A/B. Su uso más

@@ -39,6 +39,19 @@ test.describe('home', () => {
     await details.locator('summary').click();
     await expect(details).toHaveAttribute('open', '');
   });
+
+  test('sincroniza el enlace activo con el hash de la portada', async ({ page }) => {
+    await page.goto('/#trabajo');
+    const nav = page.locator('nav[aria-label="Navegación principal"]');
+    await expect(nav.locator('a[href="/#trabajo"]')).toHaveAttribute('aria-current', 'page');
+    await expect(nav.locator('a[href="/#contacto"]')).not.toHaveAttribute('aria-current', 'page');
+
+    await page.evaluate(() => {
+      location.hash = 'contacto';
+    });
+    await expect(nav.locator('a[href="/#contacto"]')).toHaveAttribute('aria-current', 'page');
+    await expect(nav.locator('a[href="/#trabajo"]')).not.toHaveAttribute('aria-current', 'page');
+  });
 });
 
 test.describe('tema', () => {

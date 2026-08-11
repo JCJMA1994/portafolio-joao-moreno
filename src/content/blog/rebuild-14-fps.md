@@ -4,6 +4,8 @@ description: 'Cómo uso Flutter DevTools para localizar widgets que se reconstru
 pubDate: 2026-05-11
 tags: ['rendimiento', 'flutter', 'devtools']
 level: 'principiante'
+number: 36
+featured: false
 series:
   name: 'Perfilar rebuilds'
   order: 1

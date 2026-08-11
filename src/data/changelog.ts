@@ -27,13 +27,57 @@ export interface Entry {
   featured?: boolean;
 }
 
+export type EmploymentId = 'inclub' | 'freelance' | 'wmind';
+
+export interface Employment {
+  id: EmploymentId;
+  company: 'INCLUB' | 'Freelance' | 'WMIND';
+  role: string;
+  period: string;
+  context: string;
+}
+
+/** Hechos laborales canónicos; el changelog y el CV son proyecciones editoriales. */
+export const employment = [
+  {
+    id: 'inclub',
+    company: 'INCLUB',
+    role: 'Flutter Developer',
+    period: '2025—actualidad',
+    context: 'Fintech · Remoto',
+  },
+  {
+    id: 'freelance',
+    company: 'Freelance',
+    role: 'Flutter Developer',
+    period: '2024—2025',
+    context: 'Productos móviles · Remoto',
+  },
+  {
+    id: 'wmind',
+    company: 'WMIND',
+    role: 'Flutter Developer',
+    period: '2023—2024',
+    context: 'Software móvil · Remoto',
+  },
+] as const satisfies readonly Employment[];
+
+const employmentById = (id: EmploymentId) => {
+  const item = employment.find((entry) => entry.id === id);
+  if (!item) throw new Error(`Missing canonical employment: ${id}`);
+  return item;
+};
+
+const inclub = employmentById('inclub');
+const wmind = employmentById('wmind');
+
 export const changelog: Entry[] = [
   {
     version: '3.0.0+247',
     level: 'major',
-    date: 'jun 2025 — presente',
-    role: 'Flutter Developer',
-    org: 'INCLUB · Remoto',
+    date: inclub.period,
+    role: inclub.role,
+    org: `${inclub.company} · Remoto`,
     added: [
       'Persistencia offline con SQLite y sincronización al reconectar',
       'Clean Architecture: datos / dominio / presentación',
@@ -56,9 +100,9 @@ export const changelog: Entry[] = [
   {
     version: '2.0.0',
     level: 'major',
-    date: 'ene 2023 — dic 2024',
-    role: 'Flutter Developer',
-    org: 'WMIND · Remoto',
+    date: wmind.period,
+    role: wmind.role,
+    org: `${wmind.company} · Remoto`,
     added: [
       'Firebase: Auth, Firestore y Remote Config',
       'Releases en Google Play Console',

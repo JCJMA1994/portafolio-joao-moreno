@@ -1,6 +1,6 @@
 /**
- * Única fuente de verdad del perfil.
- * Cambia esto y cambian la home, el CV, el JSON-LD y las metaetiquetas.
+ * Fuente canónica de identidad, contacto, formación y habilidades.
+ * El CV reutiliza estos datos, pero mantiene copy y experiencia dirigidos a vacantes Flutter.
  */
 export const profile = {
   name: 'Jose Carlos Moreno Alemán',
@@ -101,26 +101,30 @@ export const education = [
 
 export const certifications = [
   {
+    id: 'compose',
     title: 'Desarrollo de apps para Android con Jetpack Compose y Kotlin',
     org: 'Udemy',
     date: 'ene 2024',
   },
   {
+    id: 'azure',
     title: 'Microsoft Certified: Azure Fundamentals (AZ-900)',
     org: 'Microsoft · ID I511-9834',
     date: 'dic 2022',
   },
   {
+    id: 'scrum',
     title: 'SCRUM Foundation Professional Certificate (SFPC)',
     org: 'CertiProf · ID 81669863',
     date: 'dic 2022',
   },
   {
+    id: 'gcp',
     title: 'Google Cloud Fundamentals: Core Infrastructure',
     org: 'Coursera',
     date: 'ene 2022',
   },
-];
+] as const;
 
 export const languages = [
   { name: 'Español', level: 'nativo' },
@@ -129,20 +133,24 @@ export const languages = [
 
 export const skillGroups = [
   {
+    id: 'mobile',
     group: 'Mobile',
     items: 'Flutter SDK, Dart, BLoC/Cubit, Clean Architecture, Jetpack Compose, Kotlin',
   },
   {
+    id: 'databases',
     group: 'Bases de datos',
     items: 'SQL Server (SSMS), MySQL, SQLite (persistencia offline), Firestore',
   },
   {
+    id: 'integration',
     group: 'Integración',
     items: 'APIs REST (JSON), Firebase (Auth, Firestore, Remote Config)',
   },
-  { group: 'Cloud', items: 'Google Cloud Platform, Microsoft Azure (AZ-900)' },
+  { id: 'cloud', group: 'Cloud', items: 'Google Cloud Platform, Microsoft Azure (AZ-900)' },
   {
+    id: 'tools',
     group: 'Herramientas',
     items: 'Git (Bitbucket), Jira, VS Code, Android Studio, Google Play Console, Figma',
   },
-];
+] as const;

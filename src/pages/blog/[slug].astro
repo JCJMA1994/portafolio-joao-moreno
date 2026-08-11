@@ -14,20 +14,20 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props;
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
+const toc = headings.filter((heading) => heading.depth === 2);
 const minutes = readingTime(post.body ?? '');
 const origin = Astro.site?.origin ?? '';
+const number = String(post.data.number).padStart(3, '0');
 
 const all = await getCollection('blog', ({ data }) => !data.draft);
 const seriesNav = getSeriesNav(all, post.id);
-
-// Artículos relacionados por etiqueta compartida. Solo se muestran
-// cuando el post NO pertenece a una serie: la navegación de serie
-// reemplaza al bloque de relacionados, nunca conviven ambos.
 const related = seriesNav
   ? []
   : all
-      .filter((p) => p.id !== post.id && p.data.tags.some((t) => post.data.tags.includes(t)))
+      .filter(
+        (item) => item.id !== post.id && item.data.tags.some((tag) => post.data.tags.includes(tag)),
+      )
       .slice(0, 2);
 ---
 
@@ -63,113 +63,220 @@ const related = seriesNav
   ]}
 >
   <Nav />
-
-  <main id="main" class="mx-auto max-w-[80rem] px-[var(--pad)] py-12 sm:py-20">
-    <nav
-      aria-label="Ruta de navegación"
-      class="mb-8 font-mono text-[0.625rem] tracking-[0.1em] text-slate uppercase"
-    >
-      <a href="/" class="no-underline hover:text-ink">Inicio</a> /
-      <a href="/blog" class="no-underline hover:text-ink">Blog</a> /
-      <span>{post.data.tags[0]}</span>
+  <main id="main" class="mx-auto max-w-[80rem] px-[var(--pad)]">
+    <nav aria-label="Ruta del artículo" class="article-breadcrumb">
+      <ol class="m-0 flex list-none flex-wrap gap-2 p-0">
+        <li><a href="/blog">Blog</a></li><li aria-hidden="true">/</li>
+        <li><a href={`/blog/tag/${post.data.tags[0]}`}>{post.data.tags[0]}</a></li>
+        <li aria-hidden="true">/</li><li aria-current="page">Registro {number}</li>
+      </ol>
     </nav>
 
     <article>
-      <header class="mb-10 border-b-2 border-ink pb-6">
-        <div class="mb-4">
-          <LevelBadge level={post.data.level} />
+      <header class="article-hero">
+        <div>
+          <p class="article-label">Registro {number} · Arquitectura móvil</p>
+          <h1 class="max-w-[17ch] text-[clamp(2.6rem,8vw,5.8rem)] leading-[0.92]">
+            {post.data.title}
+          </h1>
+          <p class="mt-6 max-w-[58ch] text-sm text-slate">{post.data.description}</p>
+          <div class="article-meta" aria-label="Datos del artículo">
+            <LevelBadge level={post.data.level} />
+            <span>{minutes} min de lectura</span>
+            <time datetime={isoDate(post.data.pubDate)}
+              >Publicado {formatDate(post.data.pubDate)}</time
+            >
+          </div>
         </div>
-        <h1 class="max-w-[26ch] text-[clamp(2rem,7vw,4.5rem)] leading-[0.9] font-black">
-          {post.data.title}
-        </h1>
-        <p class="mt-5 mb-0 font-mono text-[0.625rem] tracking-[0.12em] text-slate uppercase">
-          <time datetime={isoDate(post.data.pubDate)}>{formatDate(post.data.pubDate)}</time>
-          · {minutes} min de lectura ·
-          {
-            post.data.tags.map((tag) => (
-              <a href={`/blog/tag/${tag}`} class="no-underline hover:text-ink">
-                {tag}{' '}
-              </a>
-            ))
-          }
-        </p>
+        <aside
+          class="article-hero-note"
+          aria-label={seriesNav ? 'Serie del artículo' : 'Nota editorial'}
+        >
+          <p class="article-label">{seriesNav ? `Serie · ${seriesNav.name}` : 'Nota de campo'}</p>
+          <p>
+            {
+              seriesNav
+                ? `Entrega ${seriesNav.index} de ${seriesNav.total}`
+                : post.data.tags.join(' · ')
+            }
+          </p>
+          <p class="m-0">Persistir → encolar → reconciliar.</p>
+        </aside>
       </header>
 
-      <div class="prose-manga">
-        <Content />
+      <div class="article-grid">
+        {
+          toc.length > 0 && (
+            <aside class="article-index" aria-label="Índice del artículo">
+              <span class="article-label">En este registro</span>
+              <ol>
+                {toc.map((heading) => (
+                  <li>
+                    <a href={`#${heading.slug}`}>{heading.text}</a>
+                  </li>
+                ))}
+              </ol>
+            </aside>
+          )
+        }
+        <div class="prose-manga article-body"><Content /></div>
       </div>
     </article>
 
     {
       seriesNav && (
-        <aside class="mt-20 border-t-2 border-ink pt-8">
-          <h2 class="mb-6 text-base tracking-[0.1em]">
-            <a href={`/blog/series/${seriesNav.slug}`} class="no-underline hover:text-red">
-              {seriesNav.name}
+        <nav class="series-footer" aria-label="Navegación de la serie">
+          {seriesNav.prev ? (
+            <a class="series-link" href={`/blog/${seriesNav.prev.id}`}>
+              <span class="article-label">
+                ← Anterior · {seriesNav.index - 1}/{seriesNav.total}
+              </span>
+              <span>{seriesNav.prev.data.title}</span>
             </a>
-            <span class="ml-2 font-mono text-xs tracking-[0.08em] text-slate normal-case">
-              Parte {seriesNav.index} de {seriesNav.total}
-            </span>
-          </h2>
-          <ul class="m-0 grid list-none gap-0 border-2 border-ink p-0 sm:grid-cols-2">
-            {seriesNav.prev && (
-              <li class="border-b-2 border-ink p-5 transition-colors hover:screentone sm:border-r-2 sm:border-b-0">
-                <span class="mb-1 block font-mono text-[0.5625rem] tracking-[0.1em] text-slate uppercase">
-                  ← Anterior
-                </span>
-                <a
-                  href={`/blog/${seriesNav.prev.id}`}
-                  class="font-impact text-xl leading-none font-extrabold uppercase no-underline"
-                >
-                  {seriesNav.prev.data.title}
-                </a>
-              </li>
-            )}
-            {seriesNav.next && (
-              <li class="p-5 transition-colors hover:screentone">
-                <span class="mb-1 block font-mono text-[0.5625rem] tracking-[0.1em] text-slate uppercase">
-                  Siguiente →
-                </span>
-                <a
-                  href={`/blog/${seriesNav.next.id}`}
-                  class="font-impact text-xl leading-none font-extrabold uppercase no-underline"
-                >
-                  {seriesNav.next.data.title}
-                </a>
-              </li>
-            )}
-          </ul>
-        </aside>
+          ) : (
+            <span />
+          )}
+          {seriesNav.next && (
+            <a class="series-link text-right" href={`/blog/${seriesNav.next.id}`}>
+              <span class="article-label">
+                Siguiente · {seriesNav.index + 1}/{seriesNav.total} →
+              </span>
+              <span>{seriesNav.next.data.title}</span>
+            </a>
+          )}
+        </nav>
       )
     }
 
     {
       !seriesNav && related.length > 0 && (
-        <aside class="mt-20 border-t-2 border-ink pt-8">
-          <h2 class="mb-6 text-base tracking-[0.1em]">Sigue leyendo</h2>
-          <ul class="m-0 grid list-none gap-0 border-2 border-ink p-0 sm:grid-cols-2">
-            {related.map((item, i) => (
-              <li
-                class:list={[
-                  'p-5 transition-colors hover:screentone',
-                  i === 0 &&
-                    related.length > 1 &&
-                    'border-b-2 border-ink sm:border-r-2 sm:border-b-0',
-                ]}
-              >
-                <a
-                  href={`/blog/${item.id}`}
-                  class="font-impact text-xl leading-none font-extrabold uppercase no-underline"
-                >
-                  {item.data.title}
-                </a>
-              </li>
-            ))}
-          </ul>
+        <aside class="series-footer" aria-label="Artículos relacionados">
+          {related.map((item) => (
+            <a class="series-link" href={`/blog/${item.id}`}>
+              <span class="article-label">Sigue leyendo</span>
+              <span>{item.data.title}</span>
+            </a>
+          ))}
         </aside>
       )
     }
   </main>
-
   <Footer />
 </Base>
+
+<style>
+  .article-label {
+    display: block;
+    margin: 0 0 0.65rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-slate);
+  }
+  .article-breadcrumb {
+    padding-block: 1rem;
+    border-bottom: 1px solid var(--color-ink);
+    font: 0.625rem var(--font-mono);
+    color: var(--color-slate);
+  }
+  .article-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(13rem, 0.42fr);
+    gap: 2rem;
+    padding-block: 3.5rem 2rem;
+    border-bottom: 1px solid var(--color-ink);
+  }
+  .article-hero-note {
+    align-self: end;
+    border-left: 0.65rem solid var(--color-signal);
+    padding-left: 1rem;
+    font-size: 0.875rem;
+  }
+  .article-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    font: 0.625rem var(--font-mono);
+    color: var(--color-slate);
+  }
+  .article-grid {
+    display: grid;
+    grid-template-columns: minmax(11rem, 0.32fr) minmax(0, 1fr);
+    gap: 3rem;
+    padding-block: 2.5rem;
+  }
+  .article-index {
+    align-self: start;
+    position: sticky;
+    top: 8rem;
+    border-top: 4px solid var(--color-ink);
+    padding-top: 1rem;
+    font-size: 0.75rem;
+  }
+  .article-index ol {
+    margin: 1rem 0 0;
+    padding-left: 1.4rem;
+    color: var(--color-slate);
+  }
+  .article-index li {
+    margin-bottom: 0.7rem;
+  }
+  .article-index a {
+    text-underline-offset: 0.28rem;
+  }
+  .article-body {
+    min-width: 0;
+  }
+  .article-body :global(h2),
+  .article-body :global(h3) {
+    scroll-margin-top: 9rem;
+  }
+  .series-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding-block: 1.5rem;
+    border-block: 1px solid var(--color-ink);
+  }
+  .series-link {
+    display: grid;
+    gap: 0.2rem;
+    max-width: 28rem;
+  }
+  @media (max-width: 48rem) {
+    .article-hero,
+    .article-grid {
+      grid-template-columns: 1fr;
+    }
+    .article-hero {
+      padding-top: 2rem;
+    }
+    .article-grid {
+      gap: 2rem;
+    }
+    .article-index {
+      position: static;
+      border-top-width: 1px;
+      border-bottom: 1px solid var(--color-ink);
+      padding-bottom: 1rem;
+    }
+    .article-index ol {
+      columns: 2;
+    }
+  }
+  @media (max-width: 28rem) {
+    .article-index ol {
+      columns: 1;
+    }
+    .series-footer {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+    .series-link {
+      text-align: left;
+    }
+  }
+</style>

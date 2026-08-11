@@ -4,6 +4,8 @@ description: 'Cuándo un record reemplaza a una clase de una sola vez y cuándo 
 pubDate: 2026-07-08
 tags: ['dart', 'dart-3', 'records']
 level: 'principiante'
+number: 37
+featured: false
 ---
 
 Antes de Dart 3, devolver dos valores desde una función te dejaba tres

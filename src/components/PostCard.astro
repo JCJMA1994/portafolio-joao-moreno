@@ -1,32 +1,55 @@
 ---
-import { formatDate, isoDate } from '@/lib/utils';
 import LevelBadge from '@/components/LevelBadge.astro';
 
 interface Props {
+  number: number;
   slug: string;
   title: string;
   description: string;
-  pubDate: Date;
   minutes: number;
   tags: string[];
   level: 'principiante' | 'intermedio' | 'avanzado';
 }
-const { slug, title, description, pubDate, minutes, tags, level } = Astro.props;
+
+const { number, slug, title, description, minutes, tags, level } = Astro.props;
+const displayNumber = String(number).padStart(3, '0');
 ---
 
-<li class="grid gap-1 border-b border-tone py-6">
-  <div class="flex flex-wrap items-center gap-2">
-    <p class="m-0 font-mono text-xs tracking-[0.02em] text-slate">
-      <time datetime={isoDate(pubDate)}>{formatDate(pubDate)}</time>
-      · {minutes} min · {tags[0]}
-    </p>
-    <LevelBadge level={level} />
+<li class="field-entry">
+  <span class="field-entry-number font-mono text-sm text-slate" data-post-number>
+    {displayNumber}
+  </span>
+  <div>
+    <h3 class="text-[clamp(1.35rem,3vw,2rem)] leading-none">
+      <a href={`/blog/${slug}`} class="underline decoration-1 underline-offset-6 hover:text-red">
+        {title}
+      </a>
+    </h3>
+    <p class="mt-2 mb-0 max-w-[58ch] text-sm text-slate">{description}</p>
   </div>
-  <a
-    href={`/blog/${slug}`}
-    class="max-w-[30ch] font-impact text-[clamp(1.5rem,3.6vw,2.25rem)] leading-[0.98] font-extrabold uppercase no-underline transition-colors hover:text-red"
-  >
-    {title}
-  </a>
-  <p class="mt-1 mb-0 max-w-[54ch] text-[0.9375rem] text-slate">{description}</p>
+  <div class="flex flex-wrap content-start items-center gap-2 font-mono text-[0.625rem] text-slate">
+    <LevelBadge level={level} />
+    <span>{String(minutes).padStart(2, '0')} min</span>
+    <span>{tags[0]}</span>
+  </div>
 </li>
+
+<style>
+  .field-entry {
+    display: grid;
+    grid-template-columns: 4rem minmax(0, 1fr) minmax(12rem, 0.45fr);
+    gap: 1rem;
+    padding-block: 1.5rem;
+    border-bottom: 1px solid var(--color-ink);
+  }
+  @media (max-width: 44rem) {
+    .field-entry {
+      grid-template-columns: 1fr;
+      gap: 0.45rem;
+    }
+    .field-entry-number {
+      border-bottom: 1px solid var(--color-tone);
+      padding-bottom: 0.35rem;
+    }
+  }
+</style>

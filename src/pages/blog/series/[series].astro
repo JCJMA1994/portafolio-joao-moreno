@@ -39,10 +39,10 @@ const { name, posts } = Astro.props;
       {
         posts.map((post) => (
           <PostCard
+            number={post.data.number}
             slug={post.id}
             title={post.data.title}
             description={post.data.description}
-            pubDate={post.data.pubDate}
             minutes={readingTime(post.body ?? '')}
             tags={post.data.tags}
             level={post.data.level}

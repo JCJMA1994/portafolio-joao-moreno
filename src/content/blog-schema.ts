@@ -12,6 +12,10 @@ export const blogSchema = z.object({
   pubDate: z.coerce.date(),
   updatedDate: z.coerce.date().optional(),
   tags: z.array(z.string()).min(1),
+  /** Número editorial permanente. No depende del orden de publicación. */
+  number: z.number().int().positive(),
+  /** Solo un artículo publicado puede ser el destacado del índice. */
+  featured: z.boolean(),
   draft: z.boolean().default(false),
   /** Imagen social propia; si falta se genera una por defecto */
   ogImage: z.string().optional(),

@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { changelog, featured, archive, parseVersion, compareVersionsDesc } from '@/data/changelog';
+import {
+  changelog,
+  featured,
+  archive,
+  employment,
+  parseVersion,
+  compareVersionsDesc,
+} from '@/data/changelog';
 
 describe('parseVersion', () => {
   it('descarta el número de build de pubspec', () => {
@@ -24,6 +31,14 @@ describe('compareVersionsDesc', () => {
 });
 
 describe('integridad del changelog', () => {
+  it('mantiene hechos laborales únicos y completos', () => {
+    expect(new Set(employment.map((job) => job.id)).size).toBe(employment.length);
+    for (const job of employment) {
+      expect(job.company.length).toBeGreaterThan(0);
+      expect(job.period.length).toBeGreaterThan(0);
+      expect(job.context.length).toBeGreaterThan(0);
+    }
+  });
   it('viene ya ordenado de más reciente a más antiguo', () => {
     const versions = changelog.map((e) => e.version);
     const sorted = [...versions].sort(compareVersionsDesc);

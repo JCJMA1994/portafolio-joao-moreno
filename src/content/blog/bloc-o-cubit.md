@@ -4,6 +4,8 @@ description: 'Una regla simple basada en cuántos eventos distintos tiene el flu
 pubDate: 2026-06-02
 tags: ['estado', 'flutter', 'bloc']
 level: 'intermedio'
+number: 35
+featured: false
 ---
 
 La discusión de BLoC contra Cubit suele resolverse por costumbre: el equipo

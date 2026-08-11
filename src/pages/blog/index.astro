@@ -3,22 +3,26 @@ import { getCollection } from 'astro:content';
 import Base from '@/layouts/Base.astro';
 import Nav from '@/components/Nav.astro';
 import Footer from '@/components/Footer.astro';
-import TitleCard from '@/components/TitleCard.astro';
 import PostCard from '@/components/PostCard.astro';
+import LevelBadge from '@/components/LevelBadge.astro';
 import { readingTime } from '@/lib/utils';
 import { profile } from '@/data/profile';
+import { assertBlogIndex } from '@/lib/blog-index';
 
 const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
-  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+  (a, b) => b.data.number - a.data.number,
 );
+assertBlogIndex(posts);
 
-// Las etiquetas son enlaces reales a páginas indexables, no filtros con JS.
-const tags = [...new Set(posts.flatMap((p) => p.data.tags))].sort();
+const featured = posts.find((post) => post.data.featured)!;
+const log = posts.filter((post) => !post.data.featured);
+const tags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
+const maxNumber = String(Math.max(...posts.map((post) => post.data.number))).padStart(3, '0');
 ---
 
 <Base
   title={`Blog · ${profile.name}`}
-  description="Escribo sobre Flutter, arquitectura offline-first, rendimiento y decisiones técnicas que salieron mal."
+  description="Flutter, arquitectura offline-first y decisiones de producción explicadas con evidencia, código y errores reales."
   path="/blog"
   schema={[
     {
@@ -31,46 +35,154 @@ const tags = [...new Set(posts.flatMap((p) => p.data.tags))].sort();
   ]}
 >
   <Nav />
-  <main id="main" class="mx-auto max-w-[80rem] px-[var(--pad)] py-16 sm:py-24">
-    <TitleCard ep={1} title="Blog" meta={`${posts.length} artículos`} />
+  <main id="main" class="mx-auto max-w-[80rem] px-[var(--pad)]">
+    <header class="field-hero">
+      <div>
+        <p class="field-label">Cuaderno de sistemas móviles · Registro {maxNumber}</p>
+        <h1 class="max-w-[17ch] text-[clamp(2.65rem,8vw,6rem)] leading-[0.9]">
+          Notas para software que no puede fallar cuando la red sí.
+        </h1>
+        <p class="mt-6 max-w-[58ch] text-sm text-slate">
+          Flutter, arquitectura offline-first y decisiones de producción explicadas con evidencia,
+          código y errores reales.
+        </p>
+      </div>
+      <p class="field-manifesto m-0 max-w-[34ch] text-sm">
+        No escribo tutoriales para copiar. Documento decisiones para entender qué se rompe, por qué
+        y cómo diseñarlo mejor.
+      </p>
+    </header>
 
-    <p class="mb-10 max-w-[46ch] font-impact text-[clamp(1.5rem,4vw,2.5rem)] leading-[1] uppercase">
-      Escribo sobre Flutter, arquitectura offline-first y decisiones que salieron mal.
-    </p>
-
-    <nav aria-label="Filtrar por etiqueta" class="mb-10 flex flex-wrap gap-2">
-      <span
-        class="border-2 border-ink bg-ink px-2.5 py-1 font-mono text-[0.5625rem] tracking-[0.1em] text-paper uppercase"
-      >
-        todos
-      </span>
-      {
-        tags.map((tag) => (
-          <a
-            href={`/blog/tag/${tag}`}
-            class="border-2 border-ink px-2.5 py-1 font-mono text-[0.5625rem] tracking-[0.1em] uppercase no-underline transition-colors hover:bg-ink hover:text-paper"
-          >
-            {tag}
-          </a>
-        ))
-      }
+    <nav aria-label="Rutas de lectura" class="field-filters">
+      <span class="field-label">Ruta:</span>
+      <a href="/blog" aria-current="page">Todo</a>
+      {tags.map((tag) => <a href={`/blog/tag/${tag}`}>{tag}</a>)}
     </nav>
 
-    <ul class="m-0 list-none p-0">
+    <article class="field-featured" data-featured-post>
+      <div class="field-featured-aside" aria-hidden="true">
+        <span>SEÑAL / {String(featured.data.number).padStart(2, '0')}</span>
+        <div class="field-network">
+          {Array.from({ length: 10 }, () => <span />)}
+        </div>
+        <span>Sin red → con cola → sincronizado</span>
+      </div>
+      <div class="field-featured-copy">
+        <p class="field-label">Artículo destacado · {readingTime(featured.body ?? '')} min</p>
+        <div class="mb-4"><LevelBadge level={featured.data.level} /></div>
+        <h2 class="max-w-[18ch] text-[clamp(2rem,5vw,3.8rem)] leading-[0.95]">
+          <a href={`/blog/${featured.id}`} class="underline decoration-1 underline-offset-6">
+            {featured.data.title}
+          </a>
+        </h2>
+        <p class="mt-5 max-w-[58ch] text-sm text-slate">{featured.data.description}</p>
+        <a href={`/blog/${featured.id}`} class="font-mono text-xs">Abrir registro →</a>
+      </div>
+    </article>
+
+    <ol class="m-0 list-none p-0" aria-label="Últimos artículos">
       {
-        posts.map((post) => (
+        log.map((post) => (
           <PostCard
+            number={post.data.number}
             slug={post.id}
             title={post.data.title}
             description={post.data.description}
-            pubDate={post.data.pubDate}
             minutes={readingTime(post.body ?? '')}
             tags={post.data.tags}
             level={post.data.level}
           />
         ))
       }
-    </ul>
+    </ol>
   </main>
   <Footer />
 </Base>
+
+<style>
+  .field-label {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-slate);
+  }
+  .field-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.55fr) minmax(15rem, 0.65fr);
+    gap: 2rem;
+    padding-block: 4rem 2rem;
+    border-bottom: 1px solid var(--color-ink);
+  }
+  .field-manifesto {
+    align-self: end;
+    border-left: 0.65rem solid var(--color-signal);
+    padding-left: 1rem;
+  }
+  .field-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    padding-block: 1rem;
+    border-bottom: 1px solid var(--color-ink);
+  }
+  .field-filters a {
+    border: 1px solid var(--color-ink);
+    padding: 0.35rem 0.55rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    text-decoration: none;
+  }
+  .field-filters a[aria-current='page'] {
+    background: var(--color-signal);
+    color: #141610;
+  }
+  .field-featured {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+    border-bottom: 1px solid var(--color-ink);
+  }
+  .field-featured-aside {
+    min-height: 18rem;
+    padding: 1.5rem;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+  }
+  .field-network {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.4rem;
+  }
+  .field-network span {
+    aspect-ratio: 1;
+    border: 1px solid currentColor;
+  }
+  .field-network span:nth-child(2),
+  .field-network span:nth-child(4),
+  .field-network span:nth-child(8) {
+    border-color: var(--color-signal);
+    background: var(--color-signal);
+  }
+  .field-featured-copy {
+    padding: clamp(1.25rem, 4vw, 2rem);
+  }
+  @media (max-width: 44rem) {
+    .field-hero,
+    .field-featured {
+      grid-template-columns: 1fr;
+    }
+    .field-hero {
+      padding-top: 2rem;
+    }
+    .field-featured-aside {
+      min-height: 11rem;
+    }
+  }
+</style>

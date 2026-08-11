@@ -4,6 +4,8 @@ description: 'Cómo encontrar el widget que se reconstruye de más con el Rebuil
 pubDate: 2026-07-25
 tags: ['flutter', 'rendimiento', 'devtools']
 level: 'intermedio'
+number: 41
+featured: false
 series:
   name: 'Perfilar rebuilds'
   order: 2
