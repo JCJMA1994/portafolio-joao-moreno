@@ -154,11 +154,10 @@ const title = `${profile.name} · ${profile.role}`;
       <TitleCard ep={2} title="Trabajo" meta={`${projects.length} proyectos`} />
       <div class="grid border-2 border-ink md:grid-cols-2">
         {
-          projects.map((project, i) => (
+          projects.map((project) => (
             <article
               class:list={[
-                'flex flex-col gap-3.5 p-6 transition-colors hover:screentone',
-                i === 0 && 'border-b-2 border-ink md:border-r-2 md:border-b-0',
+                'flex flex-col gap-3.5 p-6 transition-colors hover:screentone border-b-2 border-ink last:border-b-0 md:[&:nth-child(odd)]:border-r-2 md:border-b-2 md:[&:nth-last-child(-n+2)]:border-b-0',
               ]}
             >
               <p class="m-0 font-mono text-[0.5rem] leading-[1.7] tracking-[0.16em] text-red uppercase">
