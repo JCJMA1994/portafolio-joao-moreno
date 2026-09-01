@@ -5,6 +5,8 @@ kind: 'Desktop & Mobile / Offline-first'
 stack: ['Flutter', 'Dart', 'Melos', 'Clean Architecture', 'Offline-first', 'PDF Engine']
 summary: 'Monorepo con tres aplicaciones Flutter especializadas para el arbitraje de combates físicos de Beyblade X y la gestión integral de torneos en entornos sin conexión a internet.'
 outcome: 'Arquitectura monorepo con Melos, motor determinista de brackets y generación offline de diplomas oficiales en PDF.'
+image: '/images/work/beyscore.jpg'
+imageAlt: 'Mockup del sistema de gestión de torneos y scorecards BeyScore'
 order: 3
 ---
 

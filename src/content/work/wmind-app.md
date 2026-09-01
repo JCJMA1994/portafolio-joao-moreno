@@ -5,6 +5,8 @@ kind: 'App móvil / Firebase & Cloud'
 stack: ['Flutter', 'Dart', 'Firebase', 'Firestore', 'Remote Config', 'Spring Boot']
 summary: 'Arquitectura móvil conectada a backend Spring Boot y suite de Firebase para autenticación segura, persistencia local y distribución dinámica con feature flags.'
 outcome: '30+ pantallas modulares entregadas con telemetría en tiempo real y despliegue continuo en Google Play.'
+image: '/images/work/wmind-app.jpg'
+imageAlt: 'Mockup del dashboard móvil y telemetría de bienestar de WMIND'
 order: 2
 ---
 

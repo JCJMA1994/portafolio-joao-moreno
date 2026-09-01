@@ -5,6 +5,8 @@ kind: 'App móvil / EdTech'
 stack: ['Flutter', 'Dart', 'BLoC', 'Clean Architecture', 'FastAPI', 'SQLite']
 summary: 'Aplicación móvil de alto rendimiento y arquitectura limpia para la preparación del examen de reglas de tránsito del MTC (Perú) con diagnóstico granular por tema y soporte de las 9 categorías oficiales.'
 outcome: 'Motor de evaluación con reglas de negocio del MTC, feedback analítico por área y backend en FastAPI para sincronización de balotarios.'
+image: '/images/work/simulacro-mtc.jpg'
+imageAlt: 'Mockup del simulador de exámenes de reglas de tránsito del MTC'
 order: 4
 ---
 

@@ -41,6 +41,7 @@ const schema = [
   title={`${project.data.title} · ${project.data.org}`}
   description={project.data.summary}
   path={`/trabajo/${project.id}`}
+  ogImage={project.data.image}
   schema={schema}
 >
   <Nav />
@@ -49,7 +50,10 @@ const schema = [
       aria-label="Ruta de navegación"
       class="mb-8 font-mono text-[0.625rem] tracking-[0.1em] text-slate uppercase"
     >
-      <a href="/" class="no-underline hover:text-ink">Inicio</a> / <span>Trabajo</span>
+      <a href="/" class="no-underline hover:text-ink">Inicio</a> / <a
+        href="/#trabajo"
+        class="no-underline hover:text-ink">Trabajo</a
+      > / <span>{project.data.title}</span>
     </nav>
 
     <article>
@@ -64,6 +68,21 @@ const schema = [
           {project.data.org} · {project.data.stack.join(' · ')}
         </p>
       </header>
+
+      {
+        project.data.image && (
+          <div class="mb-12 overflow-hidden border-2 border-ink">
+            <img
+              src={project.data.image}
+              alt={project.data.imageAlt ?? project.data.title}
+              class="aspect-[16/9] w-full object-cover"
+              loading="eager"
+              decoding="async"
+            />
+          </div>
+        )
+      }
+
       <div class="prose-manga"><Content /></div>
     </article>
 

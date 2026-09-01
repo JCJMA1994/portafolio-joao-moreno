@@ -163,12 +163,24 @@ const title = `${profile.name} · ${profile.role}`;
               <p class="m-0 font-mono text-[0.5rem] leading-[1.7] tracking-[0.16em] text-red uppercase">
                 {project.data.kind}
               </p>
-              <div
-                class="grid aspect-[16/10] place-items-center border border-tone font-mono text-[0.5rem] tracking-[0.16em] text-slate uppercase"
-                style="background:repeating-linear-gradient(135deg,var(--color-tone) 0 1px,transparent 1px 11px)"
-              >
-                captura de la app
-              </div>
+              {project.data.image ? (
+                <div class="overflow-hidden border border-ink">
+                  <img
+                    src={project.data.image}
+                    alt={project.data.imageAlt ?? project.data.title}
+                    class="aspect-[16/10] w-full object-cover transition-transform duration-300 hover:scale-[1.02]"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+              ) : (
+                <div
+                  class="grid aspect-[16/10] place-items-center border border-tone font-mono text-[0.5rem] tracking-[0.16em] text-slate uppercase"
+                  style="background:repeating-linear-gradient(135deg,var(--color-tone) 0 1px,transparent 1px 11px)"
+                >
+                  captura de la app
+                </div>
+              )}
               <h3 class="text-xl">
                 {project.data.title} · {project.data.org}
               </h3>

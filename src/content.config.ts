@@ -35,6 +35,8 @@ const work = defineCollection({
     summary: z.string(),
     /** Resultado medible. Sin esto la tarjeta no convence a nadie. */
     outcome: z.string().optional(),
+    image: z.string().optional(),
+    imageAlt: z.string().optional(),
     order: z.number().int().default(99),
     draft: z.boolean().default(false),
   }),

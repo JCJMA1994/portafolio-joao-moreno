@@ -5,6 +5,8 @@ kind: 'Fintech / Offline-first'
 stack: ['Flutter', 'Dart', 'SQLite', 'BLoC', 'REST', 'Shorebird', 'Sentry']
 summary: 'Plataforma móvil financiera con arquitectura por capas, verificación biométrica KYC y sincronización offline-first con SQLite para operar bajo conectividad intermitente.'
 outcome: '99.5% de sesiones crash-free y sincronización bidireccional automática sin pérdida de transacciones.'
+image: '/images/work/inclub-app.jpg'
+imageAlt: 'Mockup de la app financiera y verificación biométrica KYC de INCLUB'
 order: 1
 ---
 
