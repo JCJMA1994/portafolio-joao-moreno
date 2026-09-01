@@ -271,19 +271,11 @@ const title = `${profile.name} · ${profile.role}`;
     <!-- ══════════════ 05 SOBRE MÍ ══════════════ -->
     <section class="reveal py-16 sm:py-24">
       <TitleCard ep={5} title="Sobre mí" />
-      <div class="grid border-2 border-ink md:grid-cols-[14rem_1fr]">
-        <div
-          class="grid aspect-[4/5] place-items-center border-b-2 border-ink p-4 text-center font-mono text-[0.5rem] tracking-[0.16em] text-slate uppercase md:aspect-auto md:border-r-2 md:border-b-0"
-          style="background:repeating-linear-gradient(135deg,var(--color-tone) 0 1px,transparent 1px 12px)"
-        >
-          foto 4:5<br />o quitar
-        </div>
-        <div class="p-6">
-          {profile.bio.map((para) => <p class="mb-4 max-w-[62ch] last:mb-0">{para}</p>)}
-          <p class="mt-4 mb-0 max-w-[62ch]">
-            Ahora busco <span class="marker marker-on">{profile.seeking}</span>{profile.seekingRest}
-          </p>
-        </div>
+      <div class="border-2 border-ink p-6 sm:p-8">
+        {profile.bio.map((para) => <p class="mb-4 max-w-[65ch] last:mb-0">{para}</p>)}
+        <p class="mt-4 mb-0 max-w-[65ch]">
+          Ahora busco <span class="marker marker-on">{profile.seeking}</span>{profile.seekingRest}
+        </p>
       </div>
 
       <dl class="mt-8 grid border-2 border-ink md:grid-cols-3">
