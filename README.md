@@ -21,7 +21,7 @@ npm run dev          # http://localhost:4321
 Antes del despliegue en producción, valida la URL en `astro.config.mjs`:
 
 ```js
-const SITE = 'https://portafolio-joao-moreno.vercel.app'; // o tu dominio personalizado
+const SITE = 'https://portafolio.system-failed-tech.com';
 ```
 
 Sin esto, las etiquetas canonical, el JSON-LD, el sitemap y el feed RSS se generarán con dominios incorrectos.

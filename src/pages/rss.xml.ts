@@ -12,7 +12,7 @@ export async function GET(context: APIContext) {
     title: `${profile.name} · Blog`,
     description:
       'Flutter, arquitectura offline-first, rendimiento y decisiones técnicas que salieron mal.',
-    site: context.site ?? 'https://portafolio-joao-moreno.vercel.app',
+    site: context.site ?? 'https://portafolio.system-failed-tech.com',
     customData: '<language>es-PE</language>',
     items: posts.map((post) => ({
       title: post.data.title,

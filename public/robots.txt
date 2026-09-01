@@ -3,4 +3,4 @@ Allow: /
 Disallow: /cv
 Disallow: /links/stats
 
-Sitemap: https://portafolio-joao-moreno.vercel.app/sitemap-index.xml
+Sitemap: https://portafolio.system-failed-tech.com/sitemap-index.xml

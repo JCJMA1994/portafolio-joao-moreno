@@ -15,7 +15,7 @@ interface Props {
 
 const { title, description, path, ogImage = '/og.png', noindex = false, schema = [] } = Astro.props;
 
-const site = Astro.site ?? new URL('https://portafolio-joao-moreno.vercel.app');
+const site = Astro.site ?? new URL('https://portafolio.system-failed-tech.com');
 const canonical = new URL(path, site).toString();
 const ogUrl = new URL(ogImage, site).toString();
 

@@ -7,7 +7,7 @@ import tailwindcss from '@tailwindcss/vite';
 
 // Cambia esto por tu dominio real antes del primer deploy.
 // Sin `site`, los canonical y el JSON-LD salen con URLs relativas.
-const SITE = 'https://portafolio-joao-moreno.vercel.app';
+const SITE = 'https://portafolio.system-failed-tech.com';
 
 export default defineConfig({
   site: SITE,

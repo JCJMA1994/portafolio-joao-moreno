@@ -11,12 +11,37 @@ export async function getStaticPaths() {
 
 const { project } = Astro.props;
 const { Content } = await render(project);
+const site = Astro.site ?? new URL('https://portafolio.system-failed-tech.com');
+const url = new URL(`/trabajo/${project.id}`, site).toString();
+
+const schema = [
+  {
+    '@type': 'Article',
+    '@id': `${url}#article`,
+    headline: `${project.data.title} · ${project.data.org}`,
+    description: project.data.summary,
+    url,
+    author: { '@id': `${site.origin}/#person` },
+    publisher: { '@id': `${site.origin}/#person` },
+    inLanguage: 'es-PE',
+    keywords: project.data.stack,
+  },
+  {
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Inicio', item: site.origin },
+      { '@type': 'ListItem', position: 2, name: 'Trabajo', item: `${site.origin}/#trabajo` },
+      { '@type': 'ListItem', position: 3, name: project.data.title, item: url },
+    ],
+  },
+];
 ---
 
 <Base
   title={`${project.data.title} · ${project.data.org}`}
   description={project.data.summary}
   path={`/trabajo/${project.id}`}
+  schema={schema}
 >
   <Nav />
   <main id="main" class="mx-auto max-w-[80rem] px-[var(--pad)] py-12 sm:py-20">
