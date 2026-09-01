@@ -40,8 +40,8 @@ const isActive = (href: string) =>
             data-nav-link
             aria-current={isActive(link.href) ? 'page' : undefined}
             class:list={[
-              'px-2 py-1.5 font-mono text-[0.625rem] font-medium tracking-[0.06em] text-slate uppercase no-underline transition-colors hover:bg-ink hover:text-paper',
-              isActive(link.href) && 'bg-ink text-paper',
+              'px-2 py-1.5 font-mono text-[0.625rem] font-medium tracking-[0.06em] uppercase no-underline transition-colors hover:bg-ink hover:text-paper',
+              isActive(link.href) ? 'bg-ink text-paper' : 'text-slate',
             ]}
           >
             {link.label}

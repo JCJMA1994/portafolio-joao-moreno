@@ -7,8 +7,10 @@ import { expect, test } from '@playwright/test';
 test.describe('simulador de conectividad', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    // client:visible: hay que esperar a que se hidrate.
-    await expect(page.getByTestId('cut-network')).toBeVisible();
+    // client:visible: hay que esperar a que se hidrate haciendo scroll al elemento.
+    const cutBtn = page.getByTestId('cut-network');
+    await cutBtn.scrollIntoViewIfNeeded();
+    await expect(cutBtn).toBeVisible();
   });
 
   test('arranca en línea con la cola vacía', async ({ page }) => {

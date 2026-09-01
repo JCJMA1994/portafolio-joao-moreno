@@ -9,7 +9,12 @@ function prefix(indent: number, last?: boolean): string {
 ---
 
 <div class="panel">
-  <div class="overflow-x-auto p-5 font-mono text-[0.6875rem] leading-[2.4]">
+  <div
+    tabindex="0"
+    role="region"
+    aria-label="Árbol de tecnologías"
+    class="overflow-x-auto p-5 font-mono text-[0.6875rem] leading-[2.4]"
+  >
     {
       stack.map((node) => (
         <div class="flex items-baseline gap-2 whitespace-nowrap">

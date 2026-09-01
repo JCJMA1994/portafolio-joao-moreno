@@ -17,7 +17,7 @@
   --color-paper: #f3f0e7;
   --color-tone: #c4c7ba;
   --color-signal: #a6d900;
-  --color-red: #618000;
+  --color-red: #4d6800;
   --color-slate: #5e6256;
 
   --font-impact: 'Instrument Serif', Georgia, serif;
@@ -319,18 +319,20 @@
   /* Resaltado de sintaxis dentro de la disciplina de cuatro colores:
      monocromo, con verde señal para las palabras clave. El código
      se lee como código impreso, no como una captura del editor. */
+  pre.astro-code,
+  .astro-code,
   .prose-manga pre {
-    --astro-code-foreground: var(--color-ink);
-    --astro-code-background: transparent;
-    --astro-code-token-comment: var(--color-slate);
-    --astro-code-token-keyword: var(--color-signal);
-    --astro-code-token-string: var(--color-ink);
-    --astro-code-token-string-expression: var(--color-ink);
-    --astro-code-token-constant: var(--color-ink);
-    --astro-code-token-function: var(--color-ink);
-    --astro-code-token-parameter: var(--color-slate);
-    --astro-code-token-punctuation: var(--color-slate);
-    --astro-code-token-link: var(--color-signal);
+    --astro-code-foreground: #f3f0e7;
+    --astro-code-background: #20231b;
+    --astro-code-token-comment: #a4a899;
+    --astro-code-token-keyword: #a6d900;
+    --astro-code-token-string: #f3f0e7;
+    --astro-code-token-string-expression: #f3f0e7;
+    --astro-code-token-constant: #f3f0e7;
+    --astro-code-token-function: #f3f0e7;
+    --astro-code-token-parameter: #c4c7ba;
+    --astro-code-token-punctuation: #c4c7ba;
+    --astro-code-token-link: #a6d900;
     background-color: #20231b !important;
     color: #f3f0e7 !important;
   }

@@ -49,19 +49,26 @@ const ROLE_SIZE = {
         )}
 
         {(entry.added || entry.removed) && (
-          <ul
-            class:list={[
-              'diff m-0 mt-4 list-none overflow-x-auto border border-tone bg-paper px-4 py-3.5 font-mono text-[0.625rem] leading-[1.95] p-0',
-              !isStatic && 'diff-animated',
-            ]}
+          <div
+            tabindex="0"
+            role="region"
+            aria-label={`Detalles de versión ${entry.version}`}
+            class="overflow-x-auto"
           >
-            {entry.added?.map((item) => (
-              <li class="add pr-4 whitespace-nowrap">{item}</li>
-            ))}
-            {entry.removed?.map((item) => (
-              <li class="rem pr-4 whitespace-nowrap">{item}</li>
-            ))}
-          </ul>
+            <ul
+              class:list={[
+                'diff m-0 mt-4 list-none border border-tone bg-paper px-4 py-3.5 font-mono text-[0.625rem] leading-[1.95] p-0',
+                !isStatic && 'diff-animated',
+              ]}
+            >
+              {entry.added?.map((item) => (
+                <li class="add pr-4 whitespace-nowrap">{item}</li>
+              ))}
+              {entry.removed?.map((item) => (
+                <li class="rem pr-4 whitespace-nowrap">{item}</li>
+              ))}
+            </ul>
+          </div>
         )}
 
         {entry.chips && (

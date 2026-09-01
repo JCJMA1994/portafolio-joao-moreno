@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro check && astro build",
-    "preview": "astro preview",
+    "preview": "node scripts/preview.mjs",
     "typecheck": "astro check",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -43,6 +43,7 @@
     "@types/react-dom": "^19.2.3",
     "prettier": "^3.9.6",
     "prettier-plugin-astro": "^0.14.1",
+    "sirv-cli": "^3.0.1",
     "typescript": "^5.7.2",
     "vitest": "^4.1.10"
   },

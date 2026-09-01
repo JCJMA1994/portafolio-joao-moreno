@@ -17,6 +17,7 @@ const pages = [
 
 for (const { path, name } of pages) {
   test(`${name} no tiene violaciones de accesibilidad`, async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto(path);
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
