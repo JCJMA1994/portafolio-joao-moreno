@@ -16,11 +16,13 @@ npm run lint         # Prettier check
 ```
 
 Run a single unit test file:
+
 ```bash
 npx vitest run tests/unit/utils.test.ts
 ```
 
 First time running E2E tests, install the browser:
+
 ```bash
 npx playwright install --with-deps chromium
 ```
@@ -31,10 +33,10 @@ E2E tests run against the **production build** (not dev server). Run `npm run bu
 
 Astro 7 portfolio with `output: 'static'` and per-route SSR opt-out (`export const prerender = false`). Everything is static (SSG) and served from the CDN except two SSR routes:
 
-| Route | Mode | Reason |
-| --- | --- | --- |
-| `/api/click` | server | writes click events to Turso/libSQL |
-| `/links/stats` | server | reads live data + HTTP Basic Auth |
+| Route          | Mode   | Reason                              |
+| -------------- | ------ | ----------------------------------- |
+| `/api/click`   | server | writes click events to Turso/libSQL |
+| `/links/stats` | server | reads live data + HTTP Basic Auth   |
 
 Path alias `@/*` maps to `src/*` (configured in both `tsconfig.json` and `vitest.config.ts`).
 
@@ -88,17 +90,18 @@ A tip under 300 words (`THIN_CONTENT_THRESHOLD` in `src/lib/utils.ts`) is shown 
 ## CI
 
 Three parallel jobs (after a shared `verificar` gate):
+
 1. `verificar` — typecheck + format + unit tests
 2. `e2e` — build → Playwright (needs `verificar`)
 3. `lighthouse` — build → Lighthouse CI with budget ≥0.95 perf, 1.0 a11y/SEO, LCP <1.5s, CLS <0.05 (needs `verificar`)
 
 ## Environment variables
 
-| Variable | Required | Purpose |
-| --- | --- | --- |
-| `TURSO_DATABASE_URL` | optional | Turso DB URL for click analytics |
-| `TURSO_AUTH_TOKEN` | optional | Turso auth token |
-| `STATS_USER` | optional* | Basic Auth user for `/links/stats` |
-| `STATS_PASSWORD` | optional* | Basic Auth password for `/links/stats` |
+| Variable             | Required  | Purpose                                |
+| -------------------- | --------- | -------------------------------------- |
+| `TURSO_DATABASE_URL` | optional  | Turso DB URL for click analytics       |
+| `TURSO_AUTH_TOKEN`   | optional  | Turso auth token                       |
+| `STATS_USER`         | optional* | Basic Auth user for `/links/stats`     |
+| `STATS_PASSWORD`     | optional* | Basic Auth password for `/links/stats` |
 
 *If absent, `/links/stats` returns 401. The site works fully without any of these; analytics simply aren't recorded.

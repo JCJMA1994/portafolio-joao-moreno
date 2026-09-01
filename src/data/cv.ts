@@ -81,11 +81,7 @@ interface AvailabilitySource {
   utcOffset: string;
 }
 
-export const cvAvailability = ({
-  available,
-  availableLabel,
-  utcOffset,
-}: AvailabilitySource) => ({
+export const cvAvailability = ({ available, availableLabel, utcOffset }: AvailabilitySource) => ({
   available,
   label: available ? availableLabel : 'No disponible actualmente',
   detail: `Remoto · ${utcOffset} · Español nativo`,

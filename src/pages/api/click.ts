@@ -8,7 +8,11 @@ export const prerender = false;
 export const POST: APIRoute = async ({ request }) => {
   let label: unknown;
   try {
-    label = JSON.parse(await request.text())?.label;
+    const raw = await request.text();
+    if (raw.length > 512) {
+      return new Response(null, { status: 413 });
+    }
+    label = JSON.parse(raw)?.label;
   } catch {
     return new Response(null, { status: 400 });
   }

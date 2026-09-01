@@ -9,7 +9,7 @@ tag: 'flutter'
 esa red llega a tu servidor. Un wifi de aeropuerto con portal cautivo reporta
 `wifi` y no navega.
 
-Úsalo como señal para *intentar* sincronizar, no como prueba de que va a
+Úsalo como señal para _intentar_ sincronizar, no como prueba de que va a
 funcionar. La verdad la da el request:
 
 ```dart

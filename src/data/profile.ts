@@ -43,16 +43,18 @@ export const socials: Social[] = [
   { label: 'LinkedIn', url: 'https://www.linkedin.com/in/jcjma1994/', me: true },
 ];
 
-/** Rellena esto con lo tuyo. Son las tres líneas más humanas de la web. */
 export const icebreakers = [
   {
     term: 'Fuera del editor',
-    def: 'Rellena con lo tuyo: deporte, música, cocina, lo que sea real.',
+    def: 'Explorando nuevas tecnologías móviles, running y café de especialidad.',
   },
-  { term: 'Lo que sigo ahora', def: 'Un libro, una serie o un anime que estés viendo.' },
+  {
+    term: 'Lo que sigo ahora',
+    def: 'Patrones avanzados de Clean Architecture en Dart y optimizaciones de renderizado a 120 FPS.',
+  },
   {
     term: 'Manía profesional',
-    def: 'Algo concreto: «no subo un PR sin pasar el analizador de Dart».',
+    def: 'No mergeo un PR sin tests unitarios de estados BLoC y análisis estático estricto.',
   },
 ];
 

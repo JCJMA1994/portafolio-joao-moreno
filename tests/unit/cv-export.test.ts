@@ -92,9 +92,11 @@ describe('exportador de CV', () => {
       });
       const rejected = expect(running).rejects.toMatchObject({ code: 'CHILD_TIMEOUT' });
       let completed = false;
-      void running.finally(() => {
-        completed = true;
-      }).catch(() => undefined);
+      void running
+        .finally(() => {
+          completed = true;
+        })
+        .catch(() => undefined);
 
       await vi.advanceTimersByTimeAsync(5);
       expect(signals).toEqual(['SIGTERM']);

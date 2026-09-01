@@ -17,7 +17,10 @@ const url = `http://${host}:${port}/cv`;
 const outputDir = resolve('output/pdf');
 const output = join(outputDir, 'CV_Jose_Carlos_Moreno_Flutter-2026.pdf');
 const temporary = join(outputDir, `.CV_Jose_Carlos_Moreno_Flutter-2026.${process.pid}.tmp.pdf`);
-const pythonTemporary = join(outputDir, `.CV_Jose_Carlos_Moreno_Flutter-2026.${randomUUID()}.reportlab.tmp.pdf`);
+const pythonTemporary = join(
+  outputDir,
+  `.CV_Jose_Carlos_Moreno_Flutter-2026.${randomUUID()}.reportlab.tmp.pdf`,
+);
 const fallbackOnly = process.argv.includes('--fallback-only');
 const types = {
   '.css': 'text/css; charset=utf-8',

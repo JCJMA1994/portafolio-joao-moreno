@@ -2,17 +2,15 @@
 
 Portfolio, blog y CV de **Jose Carlos Moreno Alemán**, desarrollador Flutter.
 
-Astro 7 · React 19 · Tailwind 4 · shadcn/ui · Vitest 4 · Playwright · Vercel
+Astro 7 · React 19 · Tailwind 4 · shadcn/ui · Vitest 4 · Playwright · Turso · Vercel
 
-**Modo híbrido:** todo se genera en el build y se sirve desde el CDN, excepto
-dos rutas que necesitan servidor (`/api/click` y `/links/stats`). La home, el
-blog y `/links` siguen siendo HTML estático.
+**Modo híbrido:** todo se genera en el build y se sirve como HTML estático desde el CDN, excepto dos rutas bajo demanda (`/api/click` y `/links/stats`). La home, el blog, los apuntes, el CV y `/links` son 100% estáticos.
 
 ---
 
 ## Puesta en marcha
 
-**Requiere Node 22.12 o superior** (lo exige Astro 7).
+**Requiere Node 22.12 o superior** (exigido por Astro 7).
 
 ```bash
 node --version       # debe ser >= 22.12
@@ -20,235 +18,162 @@ npm install
 npm run dev          # http://localhost:4321
 ```
 
-Antes del primer despliegue, cambia **una sola línea** en `astro.config.mjs`:
+Antes del despliegue en producción, valida la URL en `astro.config.mjs`:
 
 ```js
-const SITE = 'https://tudominio.com';
+const SITE = 'https://portafolio-joao-moreno.vercel.app'; // o tu dominio personalizado
 ```
 
-Sin eso, los canonical, el JSON-LD, el sitemap y el RSS salen con el dominio
-de ejemplo. Es el error de configuración que más caro sale en SEO.
+Sin esto, las etiquetas canonical, el JSON-LD, el sitemap y el feed RSS se generarán con dominios incorrectos.
+
+---
 
 ## Comandos
 
-| Comando             | Qué hace                               |
-| ------------------- | -------------------------------------- |
-| `npm run dev`       | Servidor de desarrollo                 |
-| `npm run build`     | Comprueba tipos y compila a `dist/`    |
-| `npm run preview`   | Sirve el build de producción en local  |
-| `npm run typecheck` | `astro check`                          |
-| `npm test`          | Tests unitarios (Vitest)               |
-| `npm run test:e2e`  | Tests E2E y accesibilidad (Playwright) |
-| `npm run format`    | Formatea con Prettier                  |
+| Comando               | Qué hace                                                         |
+| --------------------- | ---------------------------------------------------------------- |
+| `npm run dev`         | Servidor de desarrollo local                                     |
+| `npm run build`       | Chequeo de tipos (`astro check`) y compilación a `dist/`         |
+| `npm run preview`     | Servidor local para previsualizar el build de producción         |
+| `npm run typecheck`   | Validación estricta de tipos de TypeScript y Astro               |
+| `npm test`            | Suite completa de tests unitarios (Vitest)                       |
+| `npm run test:watch`  | Vitest en modo interactivo/watch                                 |
+| `npm run test:e2e`    | Tests End-to-End y accesibilidad con Playwright                  |
+| `npm run test:e2e:ui` | Interfaz interactiva de Playwright                               |
+| `npm run cv:pdf`      | Compila el sitio y exporta el CV a PDF (`scripts/export-cv.mjs`) |
+| `npm run lint`        | Verificación de formato y sintaxis con Prettier                  |
+| `npm run format`      | Formatea automáticamente el código con Prettier                  |
 
-La primera vez que corras los E2E necesitas los navegadores:
+Para ejecutar los tests E2E por primera vez, instala los navegadores de Playwright:
 
 ```bash
 npx playwright install --with-deps chromium
 ```
 
+> **Nota para E2E:** Los tests de Playwright se ejecutan contra el **build de producción**. Ejecuta siempre `npm run build` antes de correr `npm run test:e2e`.
+
 ---
 
-## Qué editar y dónde
+## Arquitectura de datos: Qué editar y dónde
 
-**Todo lo tuyo vive en dos archivos.** No toques los componentes para cambiar
-contenido.
+El proyecto aplica el principio de **Single Source of Truth** (fuente única de verdad). El contenido no se modifica tocando plantillas o componentes JSX/Astro.
 
-| Quiero cambiar…               | Archivo                  |
-| ----------------------------- | ------------------------ |
-| Nombre, contacto, bio, stack  | `src/data/profile.ts`    |
-| Trayectoria y certificaciones | `src/data/changelog.ts`  |
-| Artículos                     | `src/content/blog/*.md`  |
-| Apuntes cortos                | `src/content/tips/*.md`  |
-| Casos de proyecto             | `src/content/work/*.md`  |
-| Paleta y tipografías          | `src/styles/globals.css` |
+| Quiero cambiar…                  | Archivo fuente           |
+| -------------------------------- | ------------------------ |
+| Identidad, contacto, bio, stack  | `src/data/profile.ts`    |
+| Trayectoria y empresas canónicas | `src/data/changelog.ts`  |
+| Proyección y logros del CV       | `src/data/cv.ts`         |
+| Enlaces de la página `/links`    | `src/data/links.ts`      |
+| Integridad de series del blog    | `src/data/series.ts`     |
+| Artículos técnicos               | `src/content/blog/*.md`  |
+| Apuntes cortos (tips)            | `src/content/tips/*.md`  |
+| Casos de estudio de proyectos    | `src/content/work/*.md`  |
+| Tokens de diseño y paleta        | `src/styles/globals.css` |
 
 ### Publicar un artículo
 
-Crea `src/content/blog/mi-slug.md`. El nombre del archivo es la URL.
+Crea un archivo Markdown en `src/content/blog/mi-slug.md`. El nombre del archivo define su URL canónica.
 
 ```yaml
 ---
-title: 'Máximo 70 caracteres o Google lo corta'
-description: 'Entre 50 y 160 caracteres. Es lo que se lee en el buscador.'
+title: 'Máximo 70 caracteres para evitar truncado en Google'
+description: 'Entre 50 y 160 caracteres. Texto visible en SERP y tarjetas OG.'
 pubDate: 2026-08-01
-tags: ['flutter', 'rendimiento']
+tags: ['flutter', 'rendimiento', 'offline']
+level: 'intermedio' # principiante | intermedio | avanzado
 draft: false
+# Opcional (si pertenece a una serie):
+series:
+  name: 'Offline-first'
+  order: 3
 ---
 ```
 
-El esquema está validado con Zod en `src/content.config.ts`: si te olvidas de
-la descripción o pones una fecha inválida, **el build falla** en lugar de
-publicar una página sin metaetiquetas.
+El esquema está validado con Zod en `src/content/blog-schema.ts`. Si faltan campos obligatorios o la fecha es inválida, **el build falla automáticamente**.
 
-### Publicar un apunte
+### Publicar un apunte (Tip)
 
-Igual, en `src/content/tips/`, con un `number` correlativo. Ese número es una
-dirección permanente: no lo reutilices ni lo reordenes.
+Crea `src/content/tips/053-mi-apunte.md` con un `number` correlativo permanente.
 
-**Regla de contenido:** un apunte por debajo de 300 palabras se lee completo
-en `/tips` y **no** recibe URL propia. Al pasar ese umbral, la página se
-genera automáticamente en `/tips/[slug]`. Una página con 80 palabras es
-contenido pobre y arrastra la autoridad del resto del dominio.
+> **Regla de contenido (Thin-Content Threshold):**
+> Un apunte con menos de 300 palabras (`THIN_CONTENT_THRESHOLD`) se renderiza completo en la vista general de `/tips` y **no** genera una URL propia `/tips/[slug]`. Al superar las 300 palabras, Astro genera su página dedicada. Esto previene penalizaciones por contenido pobre en motores de búsqueda.
 
 ---
 
-## Decisiones de diseño
+## Decisiones de diseño y arquitectura
 
-Están documentadas en los comentarios del código, pero las tres que conviene
-no romper sin pensarlo:
+1. **Disciplina de 4 colores y texturas de manga impreso:**
+   Tinta (`--color-ink`), papel (`--color-paper`), tono de trama (`--color-tone`) y señal/rojo (`--color-signal`/`--color-red`). Los estados y transiciones se comunican con patrones de trama (_screentone_), evitando la proliferación desordenada de colores.
 
-**1. Cuatro colores, y el estado se dice con textura.**
-Tinta, papel, gris de trama y rojo de sello. Cuando el simulador se queda sin
-red, la pantalla se llena de screentone en lugar de cambiar a un quinto color.
-Si te ves necesitando otro color, casi siempre la respuesta correcta es una
-trama.
+2. **Jerarquía visual alineada a SemVer:**
+   En el `Changelog`, una versión `major` refleja cambios de empresa/rol con mayor peso tipográfico; un `minor` capacidades técnicas; y un `patch` certificaciones. La jerarquía visual equivale a la semántica real.
 
-**2. El nivel de versión controla el peso tipográfico.**
-En `changelog.ts`, un `major` se dibuja grande y un `patch` pequeño. La
-jerarquía visual ES la jerarquía semántica. Si pones un `patch` como `major`
-para que se vea más, rompes lo único que hace honesto a ese componente.
+3. **Uso selectivo de elementos de énfasis:**
+   El subrayado de rotulador (_highlighter_) está limitado a dos apariciones clave por página (Hero y Sobre mí) para mantener su impacto comunicativo.
 
-**3. El rotulador aparece dos veces por página. No más.**
-Una en el hero y otra en «Sobre mí». La tercera vez deja de ser un gesto y
-pasa a ser decoración.
-
-### El simulador de conectividad
-
-`src/components/OfflineDemo.tsx` es el único componente hidratado de toda la
-web, y se carga con `client:visible` para no bloquear el primer pintado.
-
-Existe porque demuestra tu especialidad en lugar de afirmarla: el visitante
-corta la red, ve que los pedidos siguen entrando y se sincronizan al
-reconectar. Un reclutador lo entiende en cinco segundos sin leer una palabra.
-
-Los iconos de `lucide-react` **no** están hidratados: en Astro, un componente
-React sin directiva `client:*` se renderiza a HTML estático en el build. Son
-SVG en el HTML final, con cero JavaScript de la librería.
+4. **Simulador Offline interactivo (`OfflineDemo.tsx`):**
+   Es el **único** componente React hidratado (`client:visible`) en toda la aplicación. Permite al reclutador desconectar la red virtualmente, comprobar cómo se encolan las transacciones en SQLite local y ver la reconciliación automática al reconectar. Los iconos de `lucide-react` y componentes estáticos se compilan a puro HTML sin runtime de React en el cliente.
 
 ---
 
-## Tests
+## Suite de Pruebas y Control de Calidad
 
-**40 tests unitarios** sobre el orden semántico del changelog, el cálculo de
-tiempo de lectura, el umbral de contenido pobre, la integridad de los datos del
-perfil y la lista blanca de enlaces.
-
-**E2E con Playwright** en escritorio y móvil: que el `h1` sea único, que el
-JSON-LD declare `Person` y `BlogPosting`, que el tema persista al recargar,
-que las etiquetas sean páginas reales con estado 200, que el 404 devuelva 404,
-y el flujo completo del simulador (cortar red → encolar → reconectar →
-sincronizar).
-
-**Accesibilidad con axe-core** en las cinco plantillas. Cualquier violación
-seria o crítica falla el build.
-
-**Lighthouse CI** con presupuesto: rendimiento ≥ 0,95, accesibilidad y SEO en
-1,00, LCP < 1,5 s, CLS < 0,05.
-
-El CI de GitHub Actions corre `tipos → formato → unitarios`, y en paralelo
-`e2e` y `lighthouse`.
+- **Tests unitarios (Vitest):** Más de 80 tests distribuidos en 10 suites (`tests/unit/`) que validan la integridad del perfil, esquemas de blog, cálculo de tiempo de lectura, lógica de navegación de series, exportación de CV y lista blanca de enlaces.
+- **Tests End-to-End (Playwright):** Cobertura multiplataforma (Desktop Chromium y Pixel 7) sobre la persistencia de tema claro/oscuro, singularidad del tag `h1`, tipado JSON-LD (`Person`, `ProfilePage`, `BlogPosting`), estados HTTP 200/404 y flujo completo del simulador offline.
+- **Accesibilidad automatizada (`@axe-core/playwright`):** Auditoría estricta contra violaciones de accesibilidad en Home, Blog, Artículos, Series, Tips y CV.
+- **Lighthouse CI:** Presupuesto de calidad estricto: Rendimiento ≥ 0.95, Accesibilidad = 1.0, SEO = 1.0, LCP < 1.5s, CLS < 0.05.
 
 ---
 
-## Página de enlaces y analítica
+## Tracking de enlaces y analítica con privacidad (`/links` y `/links/stats`)
 
 ### `/links`
 
-Una página tipo Linktree, pero en **tu** dominio. La diferencia importa: el
-tráfico y los enlaces entrantes acumulan autoridad en `morenoaleman.dev` en
-lugar de en `linktr.ee`. Edítala en `src/data/links.ts`.
+Página de enlaces personalizada alojada en tu propio dominio para acumular autoridad SEO (PageRank) en lugar de cederla a servicios de terceros.
 
-Sigue siendo HTML estático servido desde el CDN (1 KB de JavaScript gzip).
-Detalles que no son accidentales:
+- Enlaces propios configurados con `rel="me"` (sin `nofollow`).
+- Enlaces de afiliados marcados automáticamente como `rel="sponsored nofollow"`.
+- Marcado estructurado Schema.org (`ItemList` y `ProfilePage`).
 
-- Cada botón lleva **texto real**, no solo un icono: Google indexa eso.
-- Tus perfiles llevan `rel="me"` sin `nofollow`, para que transmitan
-  autoridad. Solo los afiliados llevan `sponsored nofollow`.
-- Hay un párrafo propio al final. Una página que solo son botones es
-  contenido pobre y Google la ignora.
-- `ItemList` y `ProfilePage` en el JSON-LD.
+### Analítica de clics (Opcional con Turso)
 
-### Analítica de clics
+La analítica está desacoplada del frontend principal mediante un diseño resiliente: si la base de datos no está configurada o se cae, el sitio web continúa funcionando sin interrupciones.
 
-**Es opcional.** Si no configuras la base de datos, `/links` funciona
-exactamente igual: simplemente no se registra nada. Eso es deliberado — un
-contador de clics no debe poder tumbar tu portafolio.
+- **Sin cookies ni almacenamiento de IP:** Recopila únicamente agregados anónimos (etiqueta del enlace, país, tipo de dispositivo, referrer). Cumple por diseño con RGPD y Ley 29733 (Perú) sin requerir banners invasivos de cookies.
+- **Transmisión no bloqueante:** Emplea `navigator.sendBeacon` para garantizar que la navegación del usuario nunca se degrade por registrar la métrica.
 
-Para activarla, crea una base gratuita en [Turso](https://turso.tech) y
-ejecuta el esquema:
+#### Configuración de base de datos (Turso):
 
 ```bash
+# 1. Crear la base de datos
 turso db create morenoaleman
+
+# 2. Aplicar el esquema SQL
 turso db shell morenoaleman < schema.sql
-turso db show morenoaleman --url        # → TURSO_DATABASE_URL
-turso db tokens create morenoaleman     # → TURSO_AUTH_TOKEN
+
+# 3. Obtener credenciales
+turso db show morenoaleman --url        # -> TURSO_DATABASE_URL
+turso db tokens create morenoaleman     # -> TURSO_AUTH_TOKEN
 ```
 
-Pon las dos variables en `.env` y en el panel de Vercel.
+Configura `TURSO_DATABASE_URL` y `TURSO_AUTH_TOKEN` en tu archivo `.env` y en Vercel.
 
-**Sobre privacidad:** no se guarda IP, ni cookie, ni huella del navegador.
-Solo la etiqueta pulsada, el país, el tipo de dispositivo y el dominio de
-procedencia. Por eso no necesitas banner de consentimiento bajo el RGPD ni la
-Ley 29733 peruana.
+### Panel privado (`/links/stats`)
 
-El tracking usa `sendBeacon`, que no bloquea ni cancela la navegación: el clic
-del visitante siempre tiene prioridad sobre la métrica.
+Ruta SSR protegida con HTTP Basic Auth (`STATS_USER` y `STATS_PASSWORD`):
 
-### `/links/stats`
-
-Panel privado con clics totales, evolución de 30 días, ranking por enlace y
-desglose por dispositivo, procedencia y país.
-
-El bloque más útil es el de abajo: **los enlaces que nadie ha pulsado nunca**.
-Ese dato te dice qué reordenar o borrar.
-
-Protegido con HTTP Basic Auth en `src/middleware.ts`. Tres detalles que sí
-importan:
-
-1. **Comparación en tiempo constante.** Un `===` normal se corta en el primer
-   carácter distinto, y esa diferencia de microsegundos permite adivinar la
-   contraseña carácter a carácter.
-2. **Falla cerrado.** Si `STATS_USER` o `STATS_PASSWORD` no están definidas, la
-   ruta devuelve 401. Mejor un panel inaccesible que uno abierto porque
-   olvidaste una variable en Vercel.
-3. **`no-store` y `noindex`** en la respuesta del reto y en la de la página,
-   más la exclusión del sitemap y del `robots.txt`.
-
-Limitación honesta: Basic Auth no tiene logout. Se cierra la sesión cerrando el
-navegador.
+- Comparación en tiempo constante (`safeEqual`) para mitigar ataques de temporización (_timing attacks_).
+- Política de fallo cerrado (_fail-closed_): Si las variables de entorno no están presentes, devuelve 401 automáticamente.
+- Cabeceras estrictas `no-store` y `noindex` con exclusión explícita en `sitemap.xml` y `robots.txt`.
 
 ---
 
-## Notas sobre Astro 7
+## Aspectos técnicos de Astro 7
 
-El proyecto está en la última versión (Astro 7, junio de 2026). Tres cosas
-que conviene saber si vienes de versiones anteriores o tocas el código:
-
-**1. El compilador es Rust y ya no perdona HTML inválido.** No auto-corrige
-anidamientos incorrectos ni etiquetas sin cerrar: da error de build. Si añades
-un `<div>` dentro de un `<p>`, lo vas a saber enseguida.
-
-**2. `compressHTML` es `'jsx'` por defecto**, así que el espacio en blanco
-entre expresiones separadas por un salto de línea desaparece, igual que en
-React. Esto muerde de verdad: `© {year}\n{profile.name}` renderiza
-«© 2026Jose Carlos». Por eso el copyright de `Footer.astro` se compone en el
-frontmatter — así es inmune a que Prettier reformatee la plantilla. Hay tres
-tests E2E en `home.spec.ts` que detectan esta clase de regresión, porque es
-invisible en el código y solo se nota leyendo la página.
-
-**3. Markdown lo procesa Sätteri**, no remark/rehype. Si algún día necesitas
-un plugin de remark o rehype, instala `@astrojs/markdown-remark` y añade
-`markdown: { processor: unified() }` a la config.
-
-El resaltado de código sigue siendo Shiki, configurado con
-`theme: 'css-variables'` para que los colores salgan de la paleta en
-`globals.css` en lugar del tema oscuro por defecto, que rompería la
-disciplina de cuatro colores.
-
-**Sobre `@astrojs/db`:** se eliminó del ecosistema en Astro 7. La analítica de
-clics usa `@libsql/client` contra Turso, que es la alternativa que recomienda
-la propia documentación de Astro.
+- **Compilador en Rust:** Exige HTML estrictamente válido. Etiquetas mal anidadas o sin cerrar producen errores en tiempo de compilación.
+- **Compresión HTML (`compressHTML: 'jsx'`):** Elimina espacios en blanco entre expresiones multilínea. Las concatenaciones de texto (como derechos de autor en el footer) se formatean en el frontmatter para prevenir inconsistencias de renderizado.
+- **Motor Markdown Sätteri:** Procesamiento de Markdown nativo y de alto rendimiento. El resaltado Shiki utiliza `theme: 'css-variables'` delegando la paleta a `globals.css`.
+- **Conectividad a base de datos:** Reemplazo de `@astrojs/db` por `@libsql/client` para interactuar con Turso en entornos serverless.
 
 ---
 
@@ -259,128 +184,23 @@ git init && git add -A && git commit -m "feat: portfolio inicial"
 gh repo create morenoaleman-dev --private --source=. --push
 ```
 
-Luego importa el repo en Vercel. Detecta Astro solo; `vercel.json` ya trae las
-cabeceras de seguridad y el cacheado inmutable de los assets. Cada rama genera
-una preview y `main` va a producción.
+Al conectar el repositorio con Vercel, el proyecto se autoconfigura mediante `@astrojs/vercel` y `vercel.json` (que incluye cabeceras de seguridad CSP/HSTS y caché inmutable para assets estáticos).
 
 ---
 
-## Pendiente antes de publicar
+## Lista de verificación antes de publicar
 
-Por orden de impacto:
-
-- [ ] **Cambiar `SITE`** en `astro.config.mjs` por tu dominio.
-- [ ] **Capturas de las apps.** Ahora hay marcos con trama. Ponlas en
-      `src/assets/` y úsalas con `astro:assets` para que se generen en WebP.
-- [ ] **Nombres reales y cifras de los proyectos.** En `src/content/work/`
-      están los marcadores `[X]s`, `[N]`. Sin números, esa sección es la más
-      débil de la web. Si hay NDA, sirve «app de gestión de campo para ~5.000
-      usuarios».
-- [ ] **Imagen OG** en `public/og-default.png`, a 1200×630.
-- [ ] **Base de Turso** si quieres la analítica de `/links` (opcional).
-- [ ] **`STATS_USER` y `STATS_PASSWORD`** en Vercel, o `/links/stats` queda
-      cerrado del todo.
-- [ ] **Foto de retrato** en «Sobre mí», o quitar el bloque. Ambas valen.
-- [ ] **Rellenar los rompehielos** en `profile.ts`. Son las tres líneas más
-      humanas de la web y ahora tienen texto de relleno.
-- [ ] **Una cita** de un lead o compañero, con nombre y cargo.
-- [ ] **Terminar los tres artículos.** Están esbozados con tu voz pero les
-      falta tu experiencia real.
-- [ ] Autoalojar las fuentes con `@fontsource` para eliminar la petición a
-      Google Fonts (mejora el LCP y evita el aviso de privacidad).
-- [ ] OG dinámicas por artículo con Satori, si quieres que cada entrada tenga
-      su propia tarjeta al compartirse.
-
-### Sobre el hueco de dic 2024 a jun 2025
-
-El formato changelog hace los huecos más visibles que un CV normal: es un
-efecto secundario de la decisión de diseño. Tienes dos opciones honestas:
-dejarlo (nadie pregunta por seis meses) o añadir una entrada `[2.2.0]` con lo
-que hiciste —cursos, proyectos propios, freelance—. Lo segundo es mejor si de
-verdad hubo algo.
+- [ ] **Configurar dominio:** Actualizar la constante `SITE` en `astro.config.mjs`.
+- [ ] **Capturas de proyectos:** Ubicar imágenes reales en `src/assets/` y consumirlas mediante `astro:assets` (formato WebP optimizado).
+- [ ] **Completar métricas de proyectos:** Sustituir marcadores en `src/content/work/*.md` con cifras e impacto demostrable.
+- [ ] **Generar imagen Open Graph:** Diseñar `public/og-default.png` (1200x630 px).
+- [ ] **Credenciales de analítica:** Definir `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, `STATS_USER` y `STATS_PASSWORD` en Vercel.
+- [ ] **Personalizar rompehielos:** Rellenar la sección `icebreakers` en `src/data/profile.ts`.
+- [ ] **Finalizar borradores:** Publicar los artículos técnicos pendientes en `src/content/blog/`.
+- [ ] **Autoalojar fuentes:** Migrar fuentes a paquetes `@fontsource` para optimizar LCP y privacidad.
 
 ---
 
 ## Licencia
 
-El código es tuyo. Las tipografías son de Google Fonts (OFL).
-
----
-
-## Tracking de enlaces (`/links` y `/links/stats`)
-
-`/links` es la página tipo Linktree que pones en la bio de Instagram o
-LinkedIn. Es **estática**, así que se sirve desde el CDN igual que el resto.
-El tracking se hace desde el navegador contra `/api/click`.
-
-### Por qué no hay cookies
-
-Solo se guardan agregados anónimos: etiqueta pulsada, país, tipo de
-dispositivo y dominio de procedencia. **Sin IP, sin cookies, sin
-identificador de usuario.** Por eso no necesitas banner de consentimiento.
-
-El clic se envía con `sendBeacon`, que no bloquea ni cancela la navegación:
-el visitante navega inmediatamente y la métrica viaja en paralelo. Si la base
-de datos falla, el visitante no se entera.
-
-### Configurarlo (opcional, 5 minutos)
-
-Sin configurar, el sitio funciona perfectamente: solo se pierden las cifras.
-
-Usamos [Turso](https://turso.tech), que es SQLite alojado. Guiño intencionado:
-es la misma base de datos que usas para la persistencia offline en Flutter.
-
-```bash
-# 1. Crear la base
-turso db create morenoaleman
-
-# 2. Crear la tabla
-turso db shell morenoaleman < schema.sql
-
-# 3. Conseguir las credenciales
-turso db show morenoaleman --url
-turso db tokens create morenoaleman
-```
-
-Copia `.env.example` a `.env` y rellena los cuatro valores. Súbelos también a
-Vercel en _Settings → Environment Variables_.
-
-```bash
-cp .env.example .env
-```
-
-### Ver las estadísticas
-
-`https://tudominio.com/links/stats`, protegido con HTTP Basic Auth. El
-navegador te pedirá `STATS_USER` y `STATS_PASSWORD`.
-
-Muestra totales, evolución de 30 días, ranking por enlace con porcentaje, y
-desglose de dispositivo y procedencia. El bloque más útil está abajo: **los
-enlaces que nadie ha pulsado**. Ese dato te dice qué reordenar o borrar.
-
-Dos limitaciones honestas: Basic Auth no tiene botón de cerrar sesión (se
-cierra al cerrar el navegador), y si faltan las variables de entorno la ruta
-devuelve 401 en lugar de abrirse. Eso último es deliberado.
-
-### Qué cambió en el despliegue
-
-El proyecto pasó de estático puro a **híbrido**. La home, el blog, los
-apuntes, el CV y `/links` siguen siendo HTML generado en build. Solo dos
-rutas se ejecutan en el servidor:
-
-| Ruta           | Modo     | Por qué                        |
-| -------------- | -------- | ------------------------------ |
-| `/api/click`   | servidor | escribe en la base de datos    |
-| `/links/stats` | servidor | lee datos en vivo + Basic Auth |
-
-Requiere el adaptador `@astrojs/vercel`, ya configurado. El LCP de la home no
-cambia: sigue siendo un archivo estático desde el CDN.
-
----
-
-## Nota sobre versiones
-
-El proyecto está en **Astro 5**, que es estable y es la versión con la que
-verifiqué los 35 tests y el build. Existe Astro 7, pero migrar implica
-revisar las colecciones de contenido y el adaptador. Si quieres actualizar más
-adelante, hazlo en una rama aparte y deja que el CI te diga qué se rompe.
+Código bajo licencia MIT / Propietario de Jose Carlos Moreno Alemán. Tipografías bajo Open Font License (OFL).
