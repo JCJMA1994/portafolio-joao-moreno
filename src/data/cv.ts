@@ -49,19 +49,23 @@ const selectedEmployment = [
 
 const directedAchievements: Record<EmploymentId, readonly string[]> = {
   inclub: [
-    'Desarrollo flujos transaccionales y componentes reutilizables con Flutter, BLoC y arquitectura por capas.',
-    'Integro servicios financieros y estados resilientes para operaciones críticas con conectividad variable.',
-    'Implementé el flujo KYC con dni_peru_ocr y reforcé la entrega continua con Shorebird, CI/CD y monitoreo en Sentry.',
+    'Desarrollé más de 30 pantallas fluidas y responsivas en Flutter/Dart desde diseño Figma para app fintech (iOS y Android) en App Store y Play Store.',
+    'Integré APIs REST bajo Clean Architecture con Cubit/BLoC, navegación con GoRouter e inyección de dependencias con GetIt.',
+    'Colaboré en la verificación de identidad (KYC) con escaneo de DNI peruano: aporté al desarrollo y pruebas de dni_peru_ocr (ML Kit, MRZ ICAO 9303) en pub.dev.',
+    'Apliqué actualizaciones OTA con Shorebird (hotfixes en minutos) y automaticé CI/CD con GitHub Actions (Android) y Xcode Cloud (iOS).',
+    'Monitoreé errores con Sentry y resolví cuellos de botella, contribuyendo al 99.5% de crash-free de la app.',
   ],
   freelance: [
-    'Entregué Go Nexa e Impulsa de extremo a extremo: autenticación, persistencia local, consumo de servicios y publicación en tiendas.',
-    'Implementé automatización CI/CD y observabilidad para acelerar releases y mantener estabilidad en producción.',
-    'Desarrollé Nuppi-Web SEL y adapté interfaces y flujos a necesidades operativas de cada producto.',
+    'Colaboré en el Portal de Proveedores de Go Nexa, SaaS multi-tenant: homologación, órdenes de compra y facturación (Next.js, NestJS, PostgreSQL).',
+    'Colaboré en Impulsa, SaaS para micro-negocios peruanos (citas, POS, inventario, facturación electrónica), aportando en la app Flutter con backend NestJS.',
+    'Colaboré en el MVP de Nuppi, POS con IA conversacional (Kotlin, Jetpack Compose, Firebase, Gemini), y en Web SEL (React 19, TypeScript, Tailwind).',
   ],
   wmind: [
-    'Construí flujos móviles completos con manejo consistente de errores, carga y estados vacíos.',
-    'Mejoré la estabilidad mediante análisis, corrección y seguimiento sistemático de fallos.',
-    'Implementé persistencia offline con SQLite e integraciones con Spring Boot, Spring Security y Firebase.',
+    'Implementé interfaces en Flutter aplicando Clean Architecture + BLoC y principios de Clean Code.',
+    'Implementé almacenamiento local con SQLite para funcionamiento offline, con sincronización al recuperar la red.',
+    'Desarrollé el backend con Java y Spring Boot: analicé y construí 10 APIs REST desde el diagrama hasta su implementación en producción.',
+    'Configuré Spring Security con roles y permisos por endpoint, y políticas CORS para el consumo seguro desde la app móvil.',
+    'Integré Firebase (Auth, Firestore, Remote Config) y gestioné releases en Google Play Console.',
   ],
 };
 

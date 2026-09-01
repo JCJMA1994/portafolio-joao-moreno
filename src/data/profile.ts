@@ -137,22 +137,28 @@ export const skillGroups = [
   {
     id: 'mobile',
     group: 'Mobile',
-    items: 'Flutter SDK, Dart, BLoC/Cubit, Clean Architecture, Jetpack Compose, Kotlin',
+    items:
+      'Flutter SDK, Dart, BLoC/Cubit, Clean Architecture, GoRouter, GetIt, Jetpack Compose, Kotlin',
   },
   {
     id: 'databases',
     group: 'Bases de datos',
-    items: 'SQL Server (SSMS), MySQL, SQLite (persistencia offline), Firestore',
+    items: 'SQL Server (SSMS), MySQL, SQLite (offline), Firestore — optimización de consultas',
   },
   {
     id: 'integration',
-    group: 'Integración',
-    items: 'APIs REST (JSON), Firebase (Auth, Firestore, Remote Config)',
+    group: 'Integración y backend',
+    items: 'APIs REST (JSON), Java, Spring Boot, Spring Security (roles, CORS), Firebase',
   },
-  { id: 'cloud', group: 'Cloud', items: 'Google Cloud Platform, Microsoft Azure (AZ-900)' },
+  {
+    id: 'cloud',
+    group: 'Cloud y DevOps',
+    items: 'GCP, Azure (AZ-900), CI/CD (GitHub Actions, Xcode Cloud), Shorebird (OTA)',
+  },
   {
     id: 'tools',
     group: 'Herramientas',
-    items: 'Git (Bitbucket), Jira, VS Code, Android Studio, Google Play Console, Figma',
+    items:
+      'Git (Bitbucket), Jira, Sentry, Android Studio, Google Play Console, App Store Connect, Figma',
   },
 ] as const;
