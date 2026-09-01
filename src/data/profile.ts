@@ -89,6 +89,88 @@ export const stack: StackNode[] = [
   },
 ];
 
+export interface StackSkill {
+  name: string;
+  icon: string;
+  highlight?: boolean;
+}
+
+export interface StackLayer {
+  layer: string;
+  badge: string;
+  description: string;
+  skills: StackSkill[];
+}
+
+export const stackLayers: StackLayer[] = [
+  {
+    layer: 'Capa 01 · Móvil & UI Reactiva',
+    badge: 'Presentation',
+    description:
+      'Interfaces declarativas a 60/120 FPS, componentes reutilizables desde Figma y gestión de estado predecible.',
+    skills: [
+      { name: 'Flutter', icon: 'flutter', highlight: true },
+      { name: 'Dart', icon: 'dart', highlight: true },
+      { name: 'BLoC / Cubit', icon: 'bloc', highlight: true },
+      { name: 'Jetpack Compose', icon: 'compose' },
+      { name: 'Kotlin', icon: 'kotlin' },
+      { name: 'GoRouter', icon: 'router' },
+    ],
+  },
+  {
+    layer: 'Capa 02 · Dominio & Arquitectura',
+    badge: 'Domain',
+    description:
+      'Separación estricta de reglas de negocio, inyección de dependencias y validación biométrica con OCR.',
+    skills: [
+      { name: 'Clean Architecture', icon: 'architecture', highlight: true },
+      { name: 'dni_peru_ocr (pub.dev)', icon: 'ocr', highlight: true },
+      { name: 'GetIt (DI)', icon: 'di' },
+      { name: 'Unit Testing', icon: 'test', highlight: true },
+      { name: 'Clean Code', icon: 'code' },
+    ],
+  },
+  {
+    layer: 'Capa 03 · Persistencia & Offline-First',
+    badge: 'Data Layer',
+    description:
+      'Bases de datos locales, colas de sincronización bidireccional y consumo robusto de APIs REST bajo contrato.',
+    skills: [
+      { name: 'SQLite (Offline-first)', icon: 'sqlite', highlight: true },
+      { name: 'APIs REST (JSON)', icon: 'api', highlight: true },
+      { name: 'Colas de Sync', icon: 'sync', highlight: true },
+      { name: 'SQL Server / MySQL', icon: 'sql' },
+      { name: 'Firestore', icon: 'firestore' },
+    ],
+  },
+  {
+    layer: 'Capa 04 · Backend & Servicios Cloud',
+    badge: 'Cloud & Services',
+    description:
+      'Construcción de microservicios con Java/Spring Boot, seguridad por roles/CORS y feature flags en la nube.',
+    skills: [
+      { name: 'Java', icon: 'java', highlight: true },
+      { name: 'Spring Boot', icon: 'spring', highlight: true },
+      { name: 'Spring Security', icon: 'security' },
+      { name: 'Firebase (Remote Config & Auth)', icon: 'firebase', highlight: true },
+      { name: 'GCP & Azure (AZ-900)', icon: 'cloud' },
+    ],
+  },
+  {
+    layer: 'Capa 05 · DevOps, Calidad & Tiendas',
+    badge: 'DevOps & Release',
+    description:
+      'Actualizaciones en caliente sin revisión de tiendas, observabilidad de errores y publicación automatizada.',
+    skills: [
+      { name: 'Shorebird (OTA Hotfixes)', icon: 'shorebird', highlight: true },
+      { name: 'Sentry (Crash Free 99.5%)', icon: 'sentry', highlight: true },
+      { name: 'GitHub Actions', icon: 'github' },
+      { name: 'Xcode Cloud', icon: 'apple' },
+      { name: 'Google Play & App Store', icon: 'stores' },
+    ],
+  },
+];
+
 export const alsoKnows =
   'Kotlin, Jetpack Compose, SQL Server, MySQL, Python, GCP, Azure (AZ-900), Figma, Jira, Bitbucket';
 
